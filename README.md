@@ -8,8 +8,7 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
 
 ## Problem Statements
 1. Nearest Greater/ Next Largest element to Left 
-2. Nearest Greater/ Next Largest element to Right [NextLargestElementToRight](.
-   /src/main/java/com/dsa/stack/NextLargestElementToRight.java)
+2. Nearest Greater/ Next Largest element to Right [NextLargestElementToRight](./src/main/java/com/dsa/stack/NextLargestElementToRight.java)
 3. Nearest Smaller Element to Left
 4. Nearest Smaller Element to Right
 5. Stock Span Problem
