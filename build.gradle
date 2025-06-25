@@ -13,6 +13,13 @@ java {
 	}
 }
 
+ext {
+	set('springCloudVersion', "2024.0.0")
+	set('testcontainerVersion', "1.19.8")
+	set('mockitoVersion', "5.12.0")
+	set('lombok.version', "1.18.32")
+}
+
 repositories {
 	mavenCentral()
 }
@@ -21,6 +28,8 @@ dependencies {
 	implementation 'org.springframework.boot:spring-boot-starter'
 	testImplementation 'org.springframework.boot:spring-boot-starter-test'
 	testRuntimeOnly 'org.junit.platform:junit-platform-launcher'
+	implementation 'org.projectlombok:lombok:1.18.38'
+	implementation("com.fasterxml.jackson.core:jackson-databind:2.18.3")
 }
 
 tasks.named('test') {
