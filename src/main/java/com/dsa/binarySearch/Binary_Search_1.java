@@ -4,7 +4,7 @@ public class Binary_Search_1 {
 	public static void main(String[] args) {
 		int[] arr = { 1, 3, 5, 7, 9, 11, 13, 15 };
         int target = 11;
-        int result = binarySearch(arr, target);
+        int result = binarySearchAscending(arr, target);
         System.out.println("Element found at index: " + result);
 	}
 
@@ -16,7 +16,7 @@ public class Binary_Search_1 {
 		If the element at mid is less than the target, the search continues in the right half by updating start to mid + 1.
 	* */
 
-	public static int binarySearch(int[] arr, int target) {
+	public static int binarySearchAscending(int[] arr, int target) {
 		int returnIndex = -1;
 		int start = 0, end = arr.length-1;
 		while(start <= end) {
