@@ -20,14 +20,15 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
 # Binary Search
 
 ## Problem Statements
-1. Binary Search [Binary Search](./src/main/java/com/dsa/binarySearch/Binary_Search_1.java)
-2. Order agnostic binary search
-3. 1st and last occurrence of BS
-4. Count of an element in a sorted array
-5. Number of times a sorted array is rotated
-6. Find an element in rotated sorted array
-7. Searching in a nearly sorted array
-8. Find floor of an element in a Sorted array
-9. Ceil of an element in a sorted array
-10. Next alphabetical element
-11. Find position of an element in an infinite sorted array 
+1. [Binary Search](./src/main/java/com/dsa/binarySearch/Binary_Search_1.java)
+2. [Binary Search on reverse sorted array](./src/main/java/com/dsa/binarySearch/Binary_Search_ReverseArray_2.java)
+3. Order agnostic binary search
+4. 1st and last occurrence of BS
+5. Count of an element in a sorted array
+6. Number of times a sorted array is rotated
+7. Find an element in rotated sorted array
+8. Searching in a nearly sorted array
+9. Find floor of an element in a Sorted array 
+10. Ceil of an element in a sorted array 
+11. Next alphabetical element 
+12. Find position of an element in an infinite sorted array 
