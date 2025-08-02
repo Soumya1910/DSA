@@ -1,6 +1,6 @@
 package com.dsa.tree;
 
-public class MaxHeightOfTree {
+public class MaxHeightOfTree_1 {
 
     public static void main(String[] args) {
         // Creating a sample tree:

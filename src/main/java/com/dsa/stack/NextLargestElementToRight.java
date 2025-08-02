@@ -2,6 +2,8 @@ package com.dsa.stack;
 
 import java.util.*;
 
+import static com.dsa.stack.Utility.displayStack;
+
 /*
 * Logic: 1. We should traverse the array from right to left.
 *        2. If stack is empty then return -1
@@ -26,7 +28,7 @@ public class NextLargestElementToRight {
         for (int i = element.size() - 1; i >= 0; i--) {
             int e = element.get(i);
             //System.out.println("Element is: " + e + "\tList: " + list);
-            //displayStack(stack);
+            // displayStack(stack);
             if (stack.empty()) {
                 list.add(-1);
                 stack.push(e);
@@ -44,9 +46,5 @@ public class NextLargestElementToRight {
         return list;
     }
 
-    private static void displayStack(Stack<Integer> stack) {
-        for (int i = stack.size() - 1; i >= 0; i--) {
-            System.out.println(stack.get(i));
-        }
-    }
+
 }
