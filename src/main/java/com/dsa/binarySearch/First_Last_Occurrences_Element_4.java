@@ -8,6 +8,7 @@ public class First_Last_Occurrences_Element_4 {
 		int lastOccurrence = lastOccurrence(arr, target);
 		System.out.println("First occurrence: " + firstOccurrence);
 		System.out.println("Last occurrence: " + lastOccurrence);
+		System.out.println("Count of occurrences: " + (lastOccurrence - firstOccurrence + 1));
 	}
 
 	/*
