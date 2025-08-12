@@ -30,5 +30,15 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
 8. [Searching in a nearly sorted array](./src/main/java/com/dsa/binarySearch/SearchInNearlySortedArray_7.java)
 9. [Find floor of an element in a Sorted array](./src/main/java/com/dsa/binarySearch/FloorElementInSortedArray_8.java) 
 10. [Ceil of an element in a sorted array](./src/main/java/com/dsa/binarySearch/FloorElementInSortedArray_8.java) 
-11. Next alphabetical element 
-12. Find position of an element in an infinite sorted array 
+11. Next alphabetical element
+    - Apply the logic of finding ceiling value
+12. Find position of an element in an infinite sorted array
+    - Start index = 0, endIndex = 1;
+    - Now we need to choose the strategy for selecting the endIndex. SearchKey is always in between startIndex and 
+      endIndex.
+    - Will increase endIndex until arr[endIndex] >= searchKey.
+    - while(arr[endIndex] >= searchKey) { endIndex = endIndex * 2 }
+    - Then apply Binary Search operation with startIndex and endIndex.
+13. [Find the index of 1st 1 in a Binary Sorted Array](./src/main/java/com/dsa/binarySearch/Index_Of_First_1_9.java)
+14. Minimum difference element in a sorted array
+15. 
