@@ -7,6 +7,12 @@ public class Index_Of_First_1_9 {
 
 	}
 
+	/*
+	* Approach:
+	* 1. If arr[mid] == 1 and arr[prevIndex] == 1 then search in left side of the array.
+	* 2. If arr[mid] == 1 and arr[prevIndex] == 0 then return mid
+	* 3. If arr[mid] == 0 then search in right array.
+	* */
 	public static int findIndexOfFirstOne(int[] arr) {
 		int start = 0;
 		int end = arr.length - 1;
