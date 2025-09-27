@@ -41,4 +41,30 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
     - Then apply Binary Search operation with startIndex and endIndex.
 13. [Find the index of 1st 1 in a Binary Sorted Array](./src/main/java/com/dsa/binarySearch/Index_Of_First_1_9.java)
 14. Minimum difference element in a sorted array
-15. 
+
+
+# Dynamic Programming
+
+- One recursive call never leads to DP.
+- If two methods are called in recursion, then there is a possibility that it will be a DP Problem.
+- You need to find Optimal value (like Minimum iteration, max profit, largest/greatest etc.)
+- DP Problem = Recursion + Storage (Memoization or Top-Down Approach)
+
+## Problem Statements
+1. [0-1 knapsack](./src/main/java/com/dsa/dp/DP_Problem_1.java)
+    * [Subset Sum](./src/main/java/com/dsa/dp/SubSet_Sum_Problem_2.java)
+    * [Equal sum partition](./src/main/java/com/dsa/dp/Equal_Sum_Partition_3.java)
+    * Count of subset sum
+    * Minimum subset sum difference
+    * Target sum
+    * Number of subset with given difference
+   
+2. Unbounded Knapsack
+3. Fibonacci
+4. LCS
+5. LIS
+6. Kadane's Algorithm
+7. Matrix Chain Multiplications
+8. DP on Trees
+9. DP on Grid
+10. Others
