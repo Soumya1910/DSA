@@ -56,8 +56,8 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
     * [Equal sum partition](./src/main/java/com/dsa/dp/Equal_Sum_Partition_3.java)
     * [Count of subset sum](./src/main/java/com/dsa/dp/Count_SubSet_Sum_4.java)
     * [Minimum subset sum difference](./src/main/java/com/dsa/dp/Minimum_SubSet_Sum_Difference_5.java)
-    * Target sum
     * [Number of subset with given difference](./src/main/java/com/dsa/dp/Count_Number_Subset_Given_Difference_6.java)
+    * [Target sum](./src/main/java/com/dsa/dp/Target_Sum_7.java)
    
 2. Unbounded Knapsack
 3. Fibonacci
