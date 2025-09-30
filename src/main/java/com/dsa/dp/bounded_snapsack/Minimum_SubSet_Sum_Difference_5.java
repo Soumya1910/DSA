@@ -1,4 +1,4 @@
-package com.dsa.dp;
+package com.dsa.dp.bounded_snapsack;
 
 public class Minimum_SubSet_Sum_Difference_5 {
 

@@ -1,7 +1,6 @@
-package com.dsa.dp;
+package com.dsa.dp.bounded_snapsack;
 
-import static com.dsa.dp.Minimum_SubSet_Sum_Difference_5.findSubSetSum;
-import static com.dsa.dp.Minimum_SubSet_Sum_Difference_5.printDpTable;
+import static com.dsa.dp.bounded_snapsack.Minimum_SubSet_Sum_Difference_5.findSubSetSum;
 
 public class Count_Number_Subset_Given_Difference_6 {
 	public static void main(String[] args) {

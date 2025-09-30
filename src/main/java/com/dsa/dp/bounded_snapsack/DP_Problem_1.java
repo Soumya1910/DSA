@@ -1,4 +1,4 @@
-package com.dsa.dp;
+package com.dsa.dp.bounded_snapsack;
 
 /*
 * You are given: n items, each with: a weight and a value (profit)

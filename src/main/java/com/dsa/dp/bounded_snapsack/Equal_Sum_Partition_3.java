@@ -1,4 +1,4 @@
-package com.dsa.dp;
+package com.dsa.dp.bounded_snapsack;
 
 public class Equal_Sum_Partition_3 {
 	public static void main(String[] args) {
