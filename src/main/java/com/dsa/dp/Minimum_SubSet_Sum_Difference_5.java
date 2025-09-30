@@ -50,7 +50,7 @@ public class Minimum_SubSet_Sum_Difference_5 {
 		return minDiff;
 	}
 
-	private static boolean[][] findSubSetSum(int[] arr, int sum) {
+	public static boolean[][] findSubSetSum(int[] arr, int sum) {
 		int n = arr.length; boolean[][] dp = new boolean[n + 1][sum + 1];
 
 		// default sum can be 0
@@ -72,7 +72,7 @@ public class Minimum_SubSet_Sum_Difference_5 {
 		return dp;
 	}
 
-	private static void printDpTable(boolean[][] dp, int[] arr, int sum) {
+	public static void printDpTable(boolean[][] dp, int[] arr, int sum) {
 		int n = arr.length;
 
 		// Print column headings (fixed width)
