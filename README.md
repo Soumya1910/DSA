@@ -68,6 +68,7 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
 4. LCS(Longest Common Subsequences)
    * Longest common substring
      * [Recursion Method](./src/main/java/com/dsa/dp/LCS/Longest_Common_Subsequence_Recursion_1.java)
+     * [Memoization Technique](./src/main/java/com/dsa/dp/LCS/Longest_Common_Subsequence_Memoization_2.java)
    * Print LCS
    * Shortest Common Supersequences (SCS)
    * Print SCS
