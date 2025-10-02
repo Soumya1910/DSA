@@ -65,7 +65,21 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
     * [Coin change problem - Minimum number of coins used](./src/main/java/com/dsa/dp/unbounded_knapsack/Min_Number_Of_Coin_Change_3.java)
 
 3. Fibonacci
-4. LCS
+4. LCS(Longest Common Subsequences)
+   * Longest common substring
+   * Print LCS
+   * Shortest Common Supersequences (SCS)
+   * Print SCS
+   * Minimum number of Insertion and Deletion (a->b)
+   * Largest repeating subsequences
+   * Length of largest subsequence of which 
+   * Subsequence pattern matching
+   * Count how many times a appears as subsequence in b
+   * Longest palindromic subsequences
+   * Longest palindromic substring
+   * Count of palindromic substring
+   * Minimum number of deletion in a string to make it Palindrome
+   * Minimum number of insertion in a string to make it Palindrome
 5. LIS
 6. Kadane's Algorithm
 7. Matrix Chain Multiplications
