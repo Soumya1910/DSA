@@ -1,4 +1,4 @@
-package com.dsa.dp.bounded_snapsack;
+package com.dsa.dp.bounded_knapsack;
 
 public class Count_SubSet_Sum_4 {
 	public static void main(String[] args) {

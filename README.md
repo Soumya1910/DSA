@@ -51,15 +51,19 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
 - DP Problem = Recursion + Storage (Memoization or Top-Down Approach)
 
 ## Problem Statements
-1. [0-1 knapsack](./src/main/java/com/dsa/dp/bounded_snapsack/DP_Problem_1.java)
-    * [Subset Sum](./src/main/java/com/dsa/dp/bounded_snapsack/SubSet_Sum_Problem_2.java)
-    * [Equal sum partition](./src/main/java/com/dsa/dp/bounded_snapsack/Equal_Sum_Partition_3.java)
-    * [Count of subset sum](./src/main/java/com/dsa/dp/bounded_snapsack/Count_SubSet_Sum_4.java)
-    * [Minimum subset sum difference](./src/main/java/com/dsa/dp/bounded_snapsack/Minimum_SubSet_Sum_Difference_5.java)
-    * [Number of subset with given difference](./src/main/java/com/dsa/dp/bounded_snapsack/Count_Number_Subset_Given_Difference_6.java)
-    * [Target sum](./src/main/java/com/dsa/dp/bounded_snapsack/Target_Sum_7.java)
+1. [0-1 knapsack](./src/main/java/com/dsa/dp/bounded_knapsack/DP_Problem_1.java)
+    * [Subset Sum](./src/main/java/com/dsa/dp/bounded_knapsack/SubSet_Sum_Problem_2.java)
+    * [Equal sum partition](./src/main/java/com/dsa/dp/bounded_knapsack/Equal_Sum_Partition_3.java)
+    * [Count of subset sum](./src/main/java/com/dsa/dp/bounded_knapsack/Count_SubSet_Sum_4.java)
+    * [Minimum subset sum difference](./src/main/java/com/dsa/dp/bounded_knapsack/Minimum_SubSet_Sum_Difference_5.java)
+    * [Number of subset with given difference](./src/main/java/com/dsa/dp/bounded_knapsack/Count_Number_Subset_Given_Difference_6.java)
+    * [Target sum](./src/main/java/com/dsa/dp/bounded_knapsack/Target_Sum_7.java)
    
 2. Unbounded Knapsack
+    * [Rod Cutting Problem](./src/main/java/com/dsa/dp/unbounded_knapsack/Rod_Cutting_Problem_1.java)
+    * [Coin change problem - Maximum number of ways](./src/main/java/com/dsa/dp/unbounded_knapsack/Max_Way_Coin_Change_2.java)
+    * [Coin change problem - Minimum number of coins used](./src/main/java/com/dsa/dp/unbounded_knapsack/Min_Number_Of_Coin_Change_3.java)
+
 3. Fibonacci
 4. LCS
 5. LIS

@@ -1,4 +1,4 @@
-package com.dsa.dp.bounded_snapsack;
+package com.dsa.dp.bounded_knapsack;
 
 public class SubSet_Sum_Problem_2 {
 	public static void main(String[] args) {

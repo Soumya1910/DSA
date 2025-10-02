@@ -1,6 +1,6 @@
-package com.dsa.dp.bounded_snapsack;
+package com.dsa.dp.bounded_knapsack;
 
-import static com.dsa.dp.bounded_snapsack.Minimum_SubSet_Sum_Difference_5.findSubSetSum;
+import static com.dsa.dp.bounded_knapsack.Minimum_SubSet_Sum_Difference_5.findSubSetSum;
 
 public class Target_Sum_7 {
 	/*
