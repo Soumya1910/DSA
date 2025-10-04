@@ -66,11 +66,12 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
 
 3. Fibonacci
 4. LCS(Longest Common Subsequences)
-   * Longest common substring
+   * Longest common subsequences
      * [Recursion Method](./src/main/java/com/dsa/dp/LCS/Longest_Common_Subsequence_Recursion_1.java)
      * [Memoization Technique](./src/main/java/com/dsa/dp/LCS/Longest_Common_Subsequence_Memoization_2.java)
      * [Top-Down DP Approach](./src/main/java/com/dsa/dp/LCS/Longest_Common_Subsequence_DP_Top_Down_3.java)
-   * Print LCS
+   * [Longest Common SubString](./src/main/java/com/dsa/dp/LCS/Longest_Common_Substring_4.java)
+   * [Print LCS](./src/main/java/com/dsa/dp/LCS/Print_LCS_5.java)
    * Shortest Common Supersequences (SCS)
    * Print SCS
    * Minimum number of Insertion and Deletion (a->b)
