@@ -79,7 +79,7 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
    * Length of largest subsequence of which 
    * Subsequence pattern matching
    * Count how many times a appears as subsequence in b
-   * Longest palindromic subsequences
+   * [Longest palindromic subsequences](./src/main/java/com/dsa/dp/LCS/Longest_Palindromic_Subsequence_8.java)
    * Longest palindromic substring
    * Count of palindromic substring
    * Minimum number of deletion in a string to make it Palindrome
