@@ -21,7 +21,7 @@ All non-common characters from both strings are included.
 	public static void main(String[] args) {
 		String a = "AGGTAB";
 		String b = "GXTXAYB";
-		int[][] dp = new int[a.length()+1][b.length()+1];
+		int[][] dp = new int[a.length() + 1][b.length() + 1];
 		int length_LCS = findLargestCommonSubsequence(a, b, a.length(), b.length(), dp); // LCS =
 		// "GTAB" (length 4)
 		int shortest_supersequence_length = a.length() + b.length() - length_LCS; // SCS length =
@@ -41,9 +41,7 @@ All non-common characters from both strings are included.
 				if (str1.charAt(i - 1) == str2.charAt(j - 1)) {
 					dp[i][j] = 1 + dp[i - 1][j - 1];
 				} else {
-					dp[i][j] = Math.max(findLargestCommonSubsequence(str1, str2, i - 1,
-							j, dp), findLargestCommonSubsequence(str1, str2, i,
-							j - 1, dp));
+					dp[i][j] = Math.max(dp[i - 1][j], dp[i][j - 1]);
 				}
 			}
 		}

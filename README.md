@@ -74,7 +74,7 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
    * [Print LCS](./src/main/java/com/dsa/dp/LCS/Print_LCS_5.java)
    * [Shortest Common Supersequences (SCS)](./src/main/java/com/dsa/dp/LCS/Shortest_Common_SuperSequence_6.java)
    * [Print SCS](./src/main/java/com/dsa/dp/LCS/Shortest_Common_SuperSequence_6.java)
-   * Minimum number of Insertion and Deletion (a->b)
+   * [Minimum number of Insertion and Deletion (a->b)](./src/main/java/com/dsa/dp/LCS/Min_Insertion_Deletion_7.java)
    * Largest repeating subsequences
    * Length of largest subsequence of which 
    * Subsequence pattern matching
