@@ -13,6 +13,28 @@ public class Longest_Palindromic_Subsequence_8 {
 	*
 	* */
 
+	/*
+	* Minimum number of deletion in a string to make it Palindrome:
+	* S = "agbdba" (Length = 6)
+	* Reverse(S) = "abdbga"
+	* Longest palindromic string is : "abdba" --> (Length = 5)
+	* Minimum number of deletion = Length(S) - Length(LCS) = 6 - 5 = 1
+	* */
+
+	/*
+	* Minimum number of insertion in a string to make it Palindrome:
+	* S = "abcaa"
+		Reverse S = "aacba"
+		LCS(S, Reverse S) = "aca"
+		Length of LPS = 3
+
+		Minimum Insertions = 5 - 3 = 2
+	*
+	* One possible palindrome after 2 insertions:
+		"aabcaa" (insert 'a' at beginning)
+		"aacbaa" (insert 'a' before final 'a')
+	* */
+
 	public static void main(String[] args) {
 		String str = "agbdba";
 		// Find the LCS(longest common subsequence) between S and reverse(S).
