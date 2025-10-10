@@ -75,15 +75,15 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
    * [Shortest Common Supersequences (SCS)](./src/main/java/com/dsa/dp/LCS/Shortest_Common_SuperSequence_6.java)
    * [Print SCS](./src/main/java/com/dsa/dp/LCS/Shortest_Common_SuperSequence_6.java)
    * [Minimum number of Insertion and Deletion (a->b)](./src/main/java/com/dsa/dp/LCS/Min_Insertion_Deletion_7.java)
-   * Largest repeating subsequences
+   * [Largest repeating subsequences](./src/main/java/com/dsa/dp/LCS/Longest_Repeating_Subsequence_9.java)
    * Length of largest subsequence of which 
    * Subsequence pattern matching
    * Count how many times a appears as subsequence in b
    * [Longest palindromic subsequences](./src/main/java/com/dsa/dp/LCS/Longest_Palindromic_Subsequence_8.java)
    * Longest palindromic substring
    * Count of palindromic substring
-   * Minimum number of deletion in a string to make it Palindrome
-   * Minimum number of insertion in a string to make it Palindrome
+   * [Minimum number of deletion in a string to make it Palindrome](./src/main/java/com/dsa/dp/LCS/Longest_Palindromic_Subsequence_8.java)
+   * [Minimum number of insertion in a string to make it Palindrome](./src/main/java/com/dsa/dp/LCS/Longest_Palindromic_Subsequence_8.java)
 5. LIS
 6. Kadane's Algorithm
 7. Matrix Chain Multiplications
