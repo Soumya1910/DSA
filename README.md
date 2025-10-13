@@ -77,7 +77,7 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
    * [Minimum number of Insertion and Deletion (a->b)](./src/main/java/com/dsa/dp/LCS/Min_Insertion_Deletion_7.java)
    * [Largest repeating subsequences](./src/main/java/com/dsa/dp/LCS/Longest_Repeating_Subsequence_9.java)
    * Length of largest subsequence of which 
-   * Subsequence pattern matching
+   * [Subsequence pattern matching](./src/main/java/com/dsa/dp/LCS/Sequence_Pattern_Matching_10.java)
    * Count how many times a appears as subsequence in b
    * [Longest palindromic subsequences](./src/main/java/com/dsa/dp/LCS/Longest_Palindromic_Subsequence_8.java)
    * Longest palindromic substring
@@ -86,7 +86,15 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
    * [Minimum number of insertion in a string to make it Palindrome](./src/main/java/com/dsa/dp/LCS/Longest_Palindromic_Subsequence_8.java)
 5. LIS
 6. Kadane's Algorithm
-7. Matrix Chain Multiplications
+7. Matrix Chain Multiplication (MCM)
+   * [MCM Recursive](./src/main/java/com/dsa/dp/MCM/Recursive_1.java)
+   * MCM Memoization
+   * Printing MCM
+   * Evaluate Expression to True / Boolean Parenthesis Test
+   * Min/Max value of an Expression
+   * Palindrome Partitioning
+   * Scramble String
+   * Egg dropping problem
 8. DP on Trees
 9. DP on Grid
 10. Others
