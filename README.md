@@ -12,8 +12,8 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
 3. [Nearest Smaller Element to Left](./src/main/java/com/dsa/stack/NextSmallerElementToLeft.java)
 4. Nearest Smaller Element to Right
 5. [Generic Method](./src/main/java/com/dsa/stack/GenericNextElement.java)
-5. Stock Span Problem
-6. Maximum Area of Histogram
+5. [Stock Span Problem](./src/main/java/com/dsa/stack/StockSpanProblem.java)
+6. [Maximum Area of Histogram](./src/main/java/com/dsa/stack/MaxAreaHistogram.java)
 7. Max area of Rectangle in Binary Matrix
 8. Rain Water Trapping
 
