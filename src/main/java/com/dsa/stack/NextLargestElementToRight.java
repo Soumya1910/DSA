@@ -33,7 +33,7 @@ public class NextLargestElementToRight {
                 list.add(-1);
                 stack.push(e);
             } else if (e >= stack.peek()) {
-                while (e >= stack.peek() && !stack.empty()) {
+                while (!stack.empty() && e >= stack.peek() ) {
                     stack.pop();
                 }
                 list.add(stack.pop());
