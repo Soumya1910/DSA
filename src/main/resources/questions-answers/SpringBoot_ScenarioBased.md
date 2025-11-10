@@ -338,3 +338,5 @@ public void methodG() {
 | **MANDATORY** | ✅ Yes | ❌ No | ❌ No | ✅ Yes | Enforce that a method must be called inside an existing transaction. |
 | **NEVER** | ❌ No | ❌ No | ❌ No | ✅ Yes | Ensure an operation never runs within a transaction. |
 | **NESTED** | ✅ Yes (with savepoint) | ✅ Yes | ❌ No | ❌ No | Partial rollbacks with savepoints inside a larger transaction; requires JDBC savepoint support. |
+
+
