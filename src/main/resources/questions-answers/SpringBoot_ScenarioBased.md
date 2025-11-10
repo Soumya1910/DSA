@@ -8,6 +8,8 @@
 6. [How would you handle multiple beans of the same type in Spring Boot?](#-how-would-you-handle-multiple-beans-of-the-same-type-in-spring-boot)
 7. [We do not want a dependency to be auto-configured by AutoConfiguration in a Spring Boot Application, what steps do we need to take to achieve this requirement?](#-we-do-not-want-a-dependency-to-be-auto-configured-by-autoconfiguration-in-a-spring-boot-application-what-steps-do-we-need-to-take-to-achieve-this-requirement)
 8. [Implementing logging of incoming requests before controller processing in Spring Boot](#-you-are-developing-a-spring-boot-application-that-handles-user-requests-to-access-a-set-of-apis-you-need-to-implement-a-logging-mechanism-that-captures-the-details-of-incoming-requests-like-url-http-method-and-request-body-before-the-controller-processes-them-how-to-achieve-that-in-spring-boot)
+9. [In a Spring Boot application, you need to ensure that all service methods annotated with `@Transactional` are logged with the execution time taken by each method. How would you implement this in Spring Boot?](#-in-a-spring-boot-application-you-need-to-ensure-that-all-service-methods-annotated-with-transactional-are-logged-with-the-execution-time-taken-by-each-method-how-would-you-implement-this-in-spring-boot)
+10. [You are tasked with securing certain endpoints in a Spring Boot application so that only users with specific roles can access them. Users authenticate via tokens that include their roles as claims. How would you configure your application to ensure that access to these endpoints is restricted based on user roles, and that the role checks are applied to method-level security in your controllers or services](#-you-are-tasked-with-securing-certain-endpoints-in-a-spring-boot-application-so-that-only-users-with-specific-roles-can-access-them-users-authenticate-via-tokens-that-include-their-roles-as-claims-how-would-you-configure-your-application-to-ensure-that-access-to-these-endpoints-is-restricted-based-on-user-roles-and-that-the-role-checks-are-applied-to-method-level-security-in-your-controllers-or-services)
 
 ---
 
@@ -735,3 +737,219 @@ public class InterceptorConfig implements WebMvcConfigurer {
 - Use **Interceptors** for **controller-specific request handling** and cross-cutting concerns like logging input parameters or measuring execution time.
 - You can combine them to achieve layered control: Filters handle coarse-grained processing, Interceptors handle fine-grained, MVC-aware tasks.
 
+
+## 🔹 In a Spring Boot application, you need to ensure that all service methods annotated with `@Transactional` are logged with the execution time taken by each method. How would you implement this in Spring Boot?
+
+This scenario tests your understanding of **Aspect Oriented Programming (AOP)** in Spring Boot.
+
+---
+
+### **Step-by-Step Approach**
+
+1. **Understanding AOP in Spring Boot**
+    - Spring Boot uses **Spring AOP** (implemented via proxies) to allow cross-cutting concerns (logging, transaction management, security) without modifying business logic.
+    - The `@Aspect` annotation marks a class as an **Aspect**.
+    - The `@Around` advice allows you to intercept method execution, both **before** and **after** the method body executes.
+
+2. **Why target `@Transactional` methods?**
+    - The `@Transactional` annotation marks methods that involve database transactions.
+    - Logging execution time for these methods helps evaluate and optimize database performance hotspots.
+
+3. **Execution Flow Diagram**
+
+```text
+Client Request
+     |
+     v
+ Service Method (Annotated with @Transactional)
+     ^
+     |  <-- AOP Intercepts here using @Around
+     |
+  Execution Time Logger Aspect
+     |
+     v
+Proceed with actual method logic
+     |
+     v
+Log Execution Time
+```
+
+```java
+import org.aspectj.lang.ProceedingJoinPoint;
+import org.aspectj.lang.annotation.Around;
+import org.aspectj.lang.annotation.Aspect;
+import org.slf4j.Logger;
+import org.slf4j.LoggerFactory;
+import org.springframework.stereotype.Component;
+import org.springframework.transaction.annotation.Transactional;
+
+@Aspect
+@Component
+public class TransactionalMethodExecutionAspect {
+
+    private static final Logger logger = LoggerFactory.getLogger(TransactionalMethodExecutionAspect.class);
+
+    /**
+     * This advice runs around all methods annotated with @Transactional
+     */
+    @Around("@annotation(transactional)")
+    public Object logExecutionTimeForTransactional(ProceedingJoinPoint joinPoint, Transactional transactional) throws Throwable {
+        long startTime = System.currentTimeMillis();
+
+        try {
+            return joinPoint.proceed(); // Execute the target method
+        } finally {
+            long totalTime = System.currentTimeMillis() - startTime;
+            logger.info("Method [{}] executed in {} ms",
+                    joinPoint.getSignature().toShortString(), totalTime);
+        }
+    }
+}
+```
+
+### **Explanation of Code**
+
+- `@Aspect` → Marks the class as an Aspect.
+- `@Around` → Intercepts method calls annotated with @Transactional.
+- `ProceedingJoinPoint` → Gives control to proceed with the actual method execution.
+- **Execution Time Measurement** → Captures start time before execution, calculates total duration afterward.
+- **Logging** → Logs method name and time taken in milliseconds.
+
+
+### **Advantages of This Approach**
+- ✅ Non-Intrusive – No need to modify each service method.  
+- ✅ Reusable – Aspect can be reused for any annotation, not just @Transactional.  
+- ✅ Centralized Logging – All transactional performance logs live in one place.
+
+
+## 🔹 You are tasked with securing certain endpoints in a Spring Boot application so that only users with specific roles can access them. Users authenticate via tokens that include their roles as claims. How would you configure your application to ensure that access to these endpoints is restricted based on user roles, and that the role checks are applied to method-level security in your controllers or services?
+
+This scenario tests your understanding of **Authentication**, **Authorization**, **JWT (JSON Web Tokens)**, and **`@PreAuthorize` annotation** with **Method-Level Security** in Spring Boot.
+
+---
+
+### **Concepts Recap**
+1. **Authentication** – Verifies the identity of the user (e.g., username/password, OAuth2 login, JWT token decoding).
+2. **Authorization** – Determines what the authenticated user is allowed to do, typically based on **roles** or **authorities**.
+3. **JWT Usage** – Encodes user identity and roles in a signed token so the backend can validate access without querying the database every time.
+4. **Method-Level Security** – Uses annotations like `@PreAuthorize` to secure specific methods at the service or controller level.
+
+---
+
+### **Step-by-Step Implementation**
+
+#### **1. Enable Method Level Security**
+Add the `@EnableMethodSecurity` (Spring Security 6+) or `@EnableGlobalMethodSecurity` (Spring Security < 6) in your security configuration class.
+
+```java
+import org.springframework.context.annotation.Configuration;
+import org.springframework.security.config.annotation.method.configuration.EnableMethodSecurity;
+
+@Configuration
+@EnableMethodSecurity // enables @PreAuthorize, @PostAuthorize, etc.
+public class SecurityConfig {
+}
+```
+
+### **Configure JWT Authentication Filter**
+A custom filter decodes the JWT sent via the Authorization header and sets the authentication object.
+
+```java
+import jakarta.servlet.FilterChain;
+import jakarta.servlet.ServletException;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import org.springframework.security.core.context.SecurityContextHolder;
+import org.springframework.web.filter.OncePerRequestFilter;
+import java.io.IOException;
+
+public class JwtAuthenticationFilter extends OncePerRequestFilter {
+
+    @Override
+    protected void doFilterInternal(HttpServletRequest request,
+                                    HttpServletResponse response,
+                                    FilterChain filterChain) throws ServletException, IOException {
+        String authHeader = request.getHeader("Authorization");
+        if (authHeader != null && authHeader.startsWith("Bearer ")) {
+            String token = authHeader.substring(7);
+
+            // JWT decoding logic (pseudo-code)
+            String username = JwtUtil.extractUsername(token);
+            List<String> roles = JwtUtil.extractRoles(token);
+
+            var authorities = roles.stream()
+                                   .map(role -> new SimpleGrantedAuthority("ROLE_" + role))
+                                   .toList();
+
+            var authentication = new UsernamePasswordAuthenticationToken(username, null, authorities);
+            SecurityContextHolder.getContext().setAuthentication(authentication);
+        }
+        filterChain.doFilter(request, response);
+    }
+}
+```
+
+### **Apply HTTP Security Config**
+In your `SecurityFilterChain` bean, register the JWT filter and restrict endpoints as needed.
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.security.config.annotation.web.builders.HttpSecurity;
+import org.springframework.security.web.SecurityFilterChain;
+
+@Configuration
+public class SecurityConfig {
+
+    @Bean
+    public SecurityFilterChain filterChain(HttpSecurity http) throws Exception {
+        return http.csrf(csrf -> csrf.disable())
+                   .authorizeHttpRequests(auth -> auth
+                       .requestMatchers("/admin/**").hasRole("ADMIN")
+                       .requestMatchers("/user/**").hasAnyRole("USER", "ADMIN")
+                       .anyRequest().authenticated()
+                   )
+                   .addFilterBefore(new JwtAuthenticationFilter(), UsernamePasswordAuthenticationFilter.class)
+                   .build();
+    }
+}
+```
+
+### **Method-Level Role Checks with `@PreAuthorize`**
+Once method security is enabled, you can restrict access at the Controller or Service method level using `@PreAuthorize`.
+```java
+import org.springframework.security.access.prepost.PreAuthorize;
+import org.springframework.web.bind.annotation.GetMapping;
+import org.springframework.web.bind.annotation.RestController;
+
+@RestController
+public class AdminController {
+
+    @GetMapping("/admin/dashboard")
+    @PreAuthorize("hasRole('ADMIN')")
+    public String adminDashboard() {
+        return "Welcome to the admin dashboard!";
+    }
+}
+```
+
+### **Execution Flow Diagram**
+```text
+[ Client Request with JWT Token ]
+        |
+        v
+-- Auth Header --> [ JWT Authentication Filter ]
+        |
+        v
+Decode Token, Extract Roles
+        |
+        v
+Set Authentication in SecurityContext
+        |
+        v
+Spring Security -> Check HTTP Config rules
+        |
+        v
+Controller Method -> @PreAuthorize role check
+        |
+        v
+Allowed or Denied
+```
