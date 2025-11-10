@@ -340,3 +340,81 @@ public void methodG() {
 | **NESTED** | ✅ Yes (with savepoint) | ✅ Yes | ❌ No | ❌ No | Partial rollbacks with savepoints inside a larger transaction; requires JDBC savepoint support. |
 
 
+
+## 🔹 How can you deploy a small Spring Boot application cost-effectively, ensuring that you only pay for server resources when the application is in use?
+
+### **Understanding the Concept**
+For applications that don't require constant uptime or have variable/infrequent traffic, **serverless platforms** (like AWS Lambda, Google Cloud Functions, or Azure Functions) offer a cost-effective and scalable deployment option.
+
+Unlike traditional deployments, you don't provision or manage servers — the cloud provider automatically runs your code when invoked.
+
+---
+
+### **Benefits of Serverless Deployment for Spring Boot**
+1. **Pay-per-Use**
+    - You only pay for the compute time your application consumes.
+    - Ideal for low-traffic or event-driven applications.
+
+2. **Scalability**
+    - Serverless platforms automatically scale your application based on demand.
+    - No manual intervention required to add/remove capacity.
+
+3. **Reduced Maintenance**
+    - No need to manage OS patches, scaling infrastructure, or idle servers.
+
+---
+
+### **Adapting Spring Boot for Serverless**
+Spring Boot can run in serverless environments via the **Spring Cloud Function** project, which enables seamless integration with AWS Lambda and other function-as-a-service (FaaS) providers.
+
+---
+
+### **Example – AWS Lambda Deployment**
+Using Spring Cloud Function, you can adapt your Spring Boot application with a handler class like below:
+
+```java
+import org.springframework.cloud.function.adapter.aws.SpringBootRequestHandler;
+
+public class LambdaHandler extends SpringBootRequestHandler<String, String> {
+}
+```
+
+---
+
+### **Use Cases in Real Projects**
+- **Event-driven microservices**  
+  Triggered by events like S3 file uploads, SNS messages, or DynamoDB streams.
+- **On-demand APIs**  
+  REST endpoints exposed via API Gateway that only execute when users make a request.
+- **Scheduled tasks**  
+  Periodic jobs triggered by AWS CloudWatch Events instead of a continuously running scheduler.
+- **Data processing pipelines**  
+  Real-time processing of incoming data streams or batch jobs without keeping a persistent server.
+
+---
+
+### **Pros**
+✅ **Cost-efficient** – Perfect for applications with sporadic workloads as you pay only for execution time.  
+✅ **Auto-scaling** – Instantly scales up or down based on demand.  
+✅ **Low maintenance** – No server patching, OS updates, or idle resource costs.  
+✅ **Quick deployment** – Deploy functions independently for rapid iteration.
+
+---
+
+### **Cons**
+⚠️ **Cold start latency** – Larger Spring Boot apps may have slower startup when scaling from zero.  
+⚠️ **Execution limits** – AWS Lambda max execution time is 15 minutes.  
+⚠️ **Resource limits** – Memory and ephemeral storage constraints may require application adjustments.  
+⚠️ **State management** – Must be stateless; managing sessions requires external storage (e.g., Redis).
+
+---
+
+### **Recommendation**
+For **small to medium-sized Spring Boot services** with **burst traffic patterns** or **infrequent usage**,  
+use **Spring Cloud Function** with **AWS Lambda** for:
+- Optimal cost-efficiency (pay-per-use billing model).
+- Automatic scalability without DevOps overhead.
+- Easy event-driven integrations with AWS services.
+
+💡 **Tip:** Minimize cold starts by reducing unused dependencies and keeping the codebase modular.  
+Also, consider using **Provisioned Concurrency** in AWS Lambda if consistent low-latency responses are critical.
