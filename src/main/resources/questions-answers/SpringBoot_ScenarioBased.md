@@ -7,6 +7,7 @@
 5. [How can you deploy a small Spring Boot application cost-effectively, ensuring that you only pay for server resources when the application is in use?](#-how-can-you-deploy-a-small-spring-boot-application-cost-effectively-ensuring-that-you-only-pay-for-server-resources-when-the-application-is-in-use)
 6. [How would you handle multiple beans of the same type in Spring Boot?](#-how-would-you-handle-multiple-beans-of-the-same-type-in-spring-boot)
 7. [We do not want a dependency to be auto-configured by AutoConfiguration in a Spring Boot Application, what steps do we need to take to achieve this requirement?](#-we-do-not-want-a-dependency-to-be-auto-configured-by-autoconfiguration-in-a-spring-boot-application-what-steps-do-we-need-to-take-to-achieve-this-requirement)
+8. [Implementing logging of incoming requests before controller processing in Spring Boot](#-you-are-developing-a-spring-boot-application-that-handles-user-requests-to-access-a-set-of-apis-you-need-to-implement-a-logging-mechanism-that-captures-the-details-of-incoming-requests-like-url-http-method-and-request-body-before-the-controller-processes-them-how-to-achieve-that-in-spring-boot)
 
 ---
 
@@ -608,4 +609,129 @@ spring:
 - Less explicit than annotation-based exclusion
 - Harder to track which configurations were excluded
 - Global scope might affect other parts of the application unintentionally
+
+
+
+## 🔹 You are developing a Spring Boot application that handles user requests to access a set of APIs.
+You need to implement a logging mechanism that captures the details of incoming requests (like **URL**, **HTTP method**, and **request body**) **before** the controller processes them. How to achieve that in Spring Boot?
+
+This scenario tests your understanding of **Interceptors in Spring Boot**.
+
+---
+
+### **Concept**
+
+**Spring Interceptors** allow you to intercept HTTP requests:
+- **Before** they reach the controller (`preHandle`).
+- **After** the controller has processed the request (`postHandle`, `afterCompletion`).
+
+They are ideal for **cross-cutting concerns** such as:
+- Logging
+- Security checks
+- Data processing
+
+**Filters** intercept requests **before** they reach the `DispatcherServlet` and are better suited for broad concerns like authentication, compression, and auditing.  
+**Interceptors** operate within the Spring MVC pipeline between the `DispatcherServlet` and controllers, allowing fine-grained request/response manipulation.
+
+---
+
+### **HandlerInterceptor Use Case for Logging**
+To log incoming request details, implement the **`HandlerInterceptor`** interface:
+- `preHandle()` → Capture and log request details before the controller executes.
+- `postHandle()` → Process logic just after controller execution but before view render.
+- `afterCompletion()` → Final processing once the response is committed.
+
+---
+
+### **Example – Logging Interceptor**
+```java
+import org.springframework.stereotype.Component;
+import org.springframework.web.servlet.HandlerInterceptor;
+
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+
+@Component
+public class LoggingInterceptor implements HandlerInterceptor {
+
+    @Override
+    public boolean preHandle(HttpServletRequest request, HttpServletResponse response, Object handler) throws Exception {
+        System.out.println("Incoming Request:");
+        System.out.println("URL: " + request.getRequestURL());
+        System.out.println("Method: " + request.getMethod());
+        // You can also read request body here if needed
+        return true; // continue to controller
+    }
+}
+```
+
+---
+
+### **Configuration**
+Register your interceptor using **`WebMvcConfigurer`** so that Spring MVC knows to apply your logging logic globally:
+
+```java
+import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.web.servlet.config.annotation.InterceptorRegistry;
+import org.springframework.web.servlet.config.annotation.WebMvcConfigurer;
+
+@Configuration
+public class InterceptorConfig implements WebMvcConfigurer {
+
+    @Autowired
+    private LoggingInterceptor loggingInterceptor;
+
+    @Override
+    public void addInterceptors(InterceptorRegistry registry) {
+        registry.addInterceptor(loggingInterceptor);
+    }
+}
+```
+---
+
+### **Diagram – Filters vs Interceptors in Spring MVC**
+
+![Interceptor Diagram](./Interceptor.png)
+
+```text
+[ Request ]
+    |
+    v
+ ---------
+| Filters |  ---> Broad tasks: Auth, Logging, Compression
+ ---------
+    |
+    v
+ -------------------
+| DispatcherServlet |
+ -------------------
+    |
+    v
+ -------------------------
+| Handler Interceptors    | ---> Fine-grained logging, model manipulation
+ -------------------------
+    |
+    v
+[ Controller ]
+```
+
+---
+
+### **Key Differences: Filters vs Interceptors**
+
+| Aspect        | Filters                                   | Interceptors                                     |
+|---------------|------------------------------------------|--------------------------------------------------|
+| **Scope**     | Before `DispatcherServlet`                | Between `DispatcherServlet` and `Controller`     |
+| **Use Cases** | Broad concerns like authentication, logging, compression | Detailed logging, modifying model/context, enriching requests |
+| **Framework** | Part of Servlet API (javax/jakarta.servlet) | Part of Spring MVC framework (org.springframework.web.servlet) |
+| **Flexibility** | Applies to all requests (including static content) | Applies only to requests routed via Spring MVC (`DispatcherServlet`) |
+| **Order of Execution** | Executed first in the chain before MVC is invoked | Executed after `DispatcherServlet` but before controller logic |
+
+---
+
+💡 **Tip:**
+- Use **Filters** for tasks that should happen for **all incoming requests** regardless of whether they are handled by Spring MVC (e.g., static resources, REST APIs, images).
+- Use **Interceptors** for **controller-specific request handling** and cross-cutting concerns like logging input parameters or measuring execution time.
+- You can combine them to achieve layered control: Filters handle coarse-grained processing, Interceptors handle fine-grained, MVC-aware tasks.
 
