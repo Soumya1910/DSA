@@ -418,3 +418,123 @@ use **Spring Cloud Function** with **AWS Lambda** for:
 
 💡 **Tip:** Minimize cold starts by reducing unused dependencies and keeping the codebase modular.  
 Also, consider using **Provisioned Concurrency** in AWS Lambda if consistent low-latency responses are critical.
+
+
+
+## 🔹 How would you handle multiple beans of the same type in Spring Boot?
+
+This scenario tests your understanding of **`@Qualifier`** and **`@Primary`** annotations in Spring Boot.
+
+When multiple beans of the same type exist in the application context, Spring needs help deciding which bean to inject.  
+Without guidance, this results in a **`NoUniqueBeanDefinitionException`**.
+
+Spring provides two primary annotations to resolve this:
+- **`@Qualifier`** – Explicitly specify the bean by name when injecting.
+- **`@Primary`** – Mark a bean as the default choice when multiple beans of the same type exist.
+
+---
+
+### **1. Using `@Qualifier`**
+The `@Qualifier` annotation helps to resolve ambiguity when multiple beans of the same type are present.  
+You can specify the **bean name** to inject the exact implementation you want.
+
+#### Example:
+```java
+@Component("creditCardPaymentService")
+public class CreditCardPaymentService implements PaymentService {
+    public void pay() {
+        System.out.println("Payment using Credit Card");
+    }
+}
+
+@Component("paypalPaymentService")
+public class PaypalPaymentService implements PaymentService {
+    public void pay() {
+        System.out.println("Payment using PayPal");
+    }
+}
+
+@Service
+public class OrderService {
+
+    private final PaymentService paymentService;
+
+    @Autowired
+    public OrderService(@Qualifier("paypalPaymentService") PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
+    public void placeOrder() {
+        paymentService.pay();
+    }
+}
+```
+
+**✅ Pros of `@Qualifier`:**
+- Precise control over which bean gets injected.
+- Useful for injecting different beans in different contexts.
+- Makes code behavior explicit and clear in multi-bean scenarios.
+
+**⚠️ Cons of `@Qualifier`:**
+- Must be specified everywhere you inject the bean — more boilerplate.
+- If bean names change, you need to update all `@Qualifier` references.
+- Not ideal when there's a clear default choice for the entire application.
+
+---
+
+### **2. Using `@Primary`**
+The `@Primary` annotation marks one bean as the **default bean** when multiple beans of the same type exist, unless overridden with `@Qualifier`.
+
+#### Example:
+```java
+@Component
+@Primary
+public class DefaultPaymentService implements PaymentService {
+    public void pay() {
+        System.out.println("Default Payment Service");
+    }
+}
+
+@Component
+public class UpiPaymentService implements PaymentService {
+    public void pay() {
+        System.out.println("Payment using UPI");
+    }
+}
+
+@Service
+public class AnotherOrderService {
+
+    private final PaymentService paymentService;
+
+    @Autowired
+    public AnotherOrderService(PaymentService paymentService) {
+        // DefaultPaymentService will be injected here by default
+        this.paymentService = paymentService;
+    }
+
+    public void placeOrder() {
+        paymentService.pay();
+    }
+}
+```
+
+**✅ Pros of `@Primary`:**
+- Eliminates the need to specify a @Qualifier for the default bean.
+- Great for setting a global default for a bean type.
+
+**⚠️ Cons of `@Primary`:**
+- Only one bean can be marked as @Primary.
+- Can cause confusion if multiple developers expect different defaults.
+- Not suitable for cases where selection should vary by context.
+
+---
+
+### When to Use What
+| Scenario | Recommended Annotation | Reason |
+|----------|------------------------|--------|
+| One clear default bean everywhere | `@Primary` | Reduces boilerplate and ensures consistent injection. |
+| Injection choice varies by use case | `@Qualifier` | Explicitly controls which bean gets injected in each scenario. |
+| Global default with occasional overrides | Combination | Mark default bean as `@Primary` and override using `@Qualifier` where needed. |
+
+💡 Pro Tip: Combine profiles (@Profile) with @Primary and @Qualifier to switch beans depending on the environment (e.g., mock beans for testing, real ones for production).
