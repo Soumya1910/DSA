@@ -1,3 +1,18 @@
+# 📚 Table of Contents
+
+1. [How can you validate two specific conditions in a YAML property file while creating a bean in a SpringBoot Application?](#-how-can-you-validate-two-specific-conditions-in-a-yaml-property-file-while-creating-a-bean-in-a-springboot-application)
+2. [Your SpringBoot application is facing Performance issue under high load. What steps would you take to diagnose and resolve the problem?](#-your-springboot-application-is-facing-performance-issue-under-high-load-what-steps-would-you-take-to-diagnose-and-resolve-the-problem)
+3. [How would you scale your springboot application to handle increased traffic and what spring boot feature can assist with this?](#-how-would-you-scale-your-springboot-application-to-handle-increased-traffic-and-what-spring-boot-feature-can-assist-with-this)
+4. [How do you manage transactions in a Spring Boot Application? and what code is running internally when using the @Transactional annotation](#-how-do-you-manage-transactions-in-a-spring-boot-application-and-what-code-is-running-internally-when-using-the-transactional-annotation)
+5. [How can you deploy a small Spring Boot application cost-effectively, ensuring that you only pay for server resources when the application is in use?](#-how-can-you-deploy-a-small-spring-boot-application-cost-effectively-ensuring-that-you-only-pay-for-server-resources-when-the-application-is-in-use)
+6. [How would you handle multiple beans of the same type in Spring Boot?](#-how-would-you-handle-multiple-beans-of-the-same-type-in-spring-boot)
+7. [We do not want a dependency to be auto-configured by AutoConfiguration in a Spring Boot Application, what steps do we need to take to achieve this requirement?](#-we-do-not-want-a-dependency-to-be-auto-configured-by-autoconfiguration-in-a-spring-boot-application-what-steps-do-we-need-to-take-to-achieve-this-requirement)
+
+---
+
+## 🔹 How can you validate two specific conditions in a YAML property file while creating a bean in a SpringBoot Application?
+...
+
 
 ## 🔹 How can you validate two specific conditions in a YAML property file while creating a bean in a SpringBoot Application?
 
@@ -538,3 +553,59 @@ public class AnotherOrderService {
 | Global default with occasional overrides | Combination | Mark default bean as `@Primary` and override using `@Qualifier` where needed. |
 
 💡 Pro Tip: Combine profiles (@Profile) with @Primary and @Qualifier to switch beans depending on the environment (e.g., mock beans for testing, real ones for production).
+
+
+## 🔹 We do not want a dependency to be auto-configured by AutoConfiguration in a Spring Boot Application, what steps do we need to take to achieve this requirement?
+
+This scenario tests your understanding of **Spring Boot AutoConfiguration**.  
+Spring Boot loads many pre-defined configuration classes automatically via its `spring-boot-autoconfigure` module.  
+If you want to **prevent** a specific auto-configuration from being loaded, you can exclude it in multiple ways.
+
+Reference: [Spring Boot AutoConfiguration Classes](https://docs.spring.io/spring-boot/docs/current/reference/html/appendix-auto-configuration-classes.html)
+
+---
+
+### **1. Exclude via Annotation**
+You can use the **`exclude`** attribute of the `@SpringBootApplication` or `@EnableAutoConfiguration` annotation to prevent a specific auto-configuration class from loading.
+
+#### Example:
+```java
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration;
+
+@SpringBootApplication(exclude = {DataSourceAutoConfiguration.class})
+public class Application {
+    public static void main(String[] args) {
+        SpringApplication.run(Application.class, args);
+    }
+}
+```
+
+---
+
+### **2. Exclude via `application.properties` or `application.yml`**
+You can also disable specific auto-configurations globally via configuration files without touching the code.
+
+#### **`application.properties`**
+```properties
+spring.autoconfigure.exclude=org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+```
+
+#### **`application.yml`**
+```yaml
+spring:
+  autoconfigure:
+    exclude: org.springframework.boot.autoconfigure.jdbc.DataSourceAutoConfiguration
+```
+
+##### Pros:
+- No code changes required
+- Configuration is centralized and versionable
+- Easy to manage multiple exclusions
+
+##### Cons:
+- Less explicit than annotation-based exclusion
+- Harder to track which configurations were excluded
+- Global scope might affect other parts of the application unintentionally
+
