@@ -10,11 +10,12 @@
 8. [Implementing logging of incoming requests before controller processing in Spring Boot](#-you-are-developing-a-spring-boot-application-that-handles-user-requests-to-access-a-set-of-apis-you-need-to-implement-a-logging-mechanism-that-captures-the-details-of-incoming-requests-like-url-http-method-and-request-body-before-the-controller-processes-them-how-to-achieve-that-in-spring-boot)
 9. [In a Spring Boot application, you need to ensure that all service methods annotated with `@Transactional` are logged with the execution time taken by each method. How would you implement this in Spring Boot?](#-in-a-spring-boot-application-you-need-to-ensure-that-all-service-methods-annotated-with-transactional-are-logged-with-the-execution-time-taken-by-each-method-how-would-you-implement-this-in-spring-boot)
 10. [You are tasked with securing certain endpoints in a Spring Boot application so that only users with specific roles can access them. Users authenticate via tokens that include their roles as claims. How would you configure your application to ensure that access to these endpoints is restricted based on user roles, and that the role checks are applied to method-level security in your controllers or services](#-you-are-tasked-with-securing-certain-endpoints-in-a-spring-boot-application-so-that-only-users-with-specific-roles-can-access-them-users-authenticate-via-tokens-that-include-their-roles-as-claims-how-would-you-configure-your-application-to-ensure-that-access-to-these-endpoints-is-restricted-based-on-user-roles-and-that-the-role-checks-are-applied-to-method-level-security-in-your-controllers-or-services)
+11. [How can you handle exceptions globally in a Spring Boot application?](#-how-can-you-handle-exceptions-globally-in-a-spring-boot-application)
+12. [IoC vs Dependency Injection vs Dependency Inversion](#-ioc-vs-dependency-injection-vs-dependency-inversion)
+
+
 
 ---
-
-## 🔹 How can you validate two specific conditions in a YAML property file while creating a bean in a SpringBoot Application?
-...
 
 
 ## 🔹 How can you validate two specific conditions in a YAML property file while creating a bean in a SpringBoot Application?
@@ -953,3 +954,230 @@ Controller Method -> @PreAuthorize role check
         v
 Allowed or Denied
 ```
+
+
+## 🔹 How can you handle exceptions globally in a Spring Boot application?
+
+This scenario tests your understanding of **centralized exception management** to avoid repetitive `try-catch` handling inside controllers or services.
+
+---
+
+### **1. Using `@RestControllerAdvice`** (Preferred for REST APIs)
+
+`@RestControllerAdvice` is a combination of `@ControllerAdvice` and `@ResponseBody`, allowing you to intercept exceptions from all `@RestController` endpoints and return structured JSON responses.
+
+#### **Example – Global Exception Handler**
+```java
+import org.springframework.http.HttpStatus;
+import org.springframework.http.ResponseEntity;
+import org.springframework.web.bind.annotation.ExceptionHandler;
+import org.springframework.web.bind.annotation.RestControllerAdvice;
+import java.time.LocalDateTime;
+
+@RestControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(ResourceNotFoundException.class)
+    public ResponseEntity<ErrorResponse> handleResourceNotFound(ResourceNotFoundException ex) {
+        ErrorResponse error = new ErrorResponse(LocalDateTime.now(),
+                                                HttpStatus.NOT_FOUND.value(),
+                                                ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.NOT_FOUND);
+    }
+
+    @ExceptionHandler(Exception.class)
+    public ResponseEntity<ErrorResponse> handleGenericException(Exception ex) {
+        ErrorResponse error = new ErrorResponse(LocalDateTime.now(),
+                                                HttpStatus.INTERNAL_SERVER_ERROR.value(),
+                                                ex.getMessage());
+        return new ResponseEntity<>(error, HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+```
+
+#### **Error Response DTO**
+
+```java
+public class ErrorResponse {
+    private LocalDateTime timestamp;
+    private int status;
+    private String message;
+
+    public ErrorResponse(LocalDateTime timestamp, int status, String message) {
+        this.timestamp = timestamp;
+        this.status = status;
+        this.message = message;
+    }
+    // Getters & setters
+}
+```
+
+#### **Custom Exception Example**
+```java
+public class ResourceNotFoundException extends RuntimeException {
+    public ResourceNotFoundException(String message) {
+        super(message);
+    }
+}
+```
+
+### **2. Using `@ControllerAdvice`** (Preferred for Mixed Responses)
+
+If you serve both HTML and JSON, use `@ControllerAdvice`
+
+```java
+@ControllerAdvice
+public class GlobalExceptionHandler {
+
+    @ExceptionHandler(Exception.class)
+    @ResponseBody
+    public ResponseEntity<String> handleException(Exception ex) {
+        return new ResponseEntity<>("Error: " + ex.getMessage(),
+                                    HttpStatus.INTERNAL_SERVER_ERROR);
+    }
+}
+```
+
+
+## 🔹 IoC vs Dependency Injection vs Dependency Inversion
+
+These three terms are related but **not the same thing** — they are core concepts in Spring and other frameworks.
+
+---
+
+### **1. IoC – Inversion of Control**
+
+**Definition (Simple):**  
+Instead of your code controlling the creation and lifecycle of objects, you **invert** control and let a framework like Spring manage them.
+
+**Key idea:**
+> "Don’t call us, we’ll call you."
+
+---
+
+**Example – Without IoC:**
+```java
+public class OrderService {
+    private PaymentService paymentService;
+
+    public OrderService() {
+        paymentService = new PaymentService(); // You create dependency yourself
+    }
+
+    public void placeOrder() {
+        paymentService.pay();
+    }
+}
+```
+
+**Example – With IoC (Spring):**
+```java
+@Component
+public class PaymentService {
+    public void pay() {
+        System.out.println("Payment processed!");
+    }
+}
+
+@Component
+public class OrderService {
+    private final PaymentService paymentService;
+
+    @Autowired
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
+    public void placeOrder() {
+        paymentService.pay();
+    }
+}
+```
+
+Here, Spring's IoC container decides when and how to create PaymentService and inject it into OrderService.
+
+💡 In short: IoC is the principle of giving control to the framework.
+
+### **2. Dependency Injection (DI)**
+
+**Definition (Simple):**
+A way to implement IoC where the framework injects required dependencies into your class.
+
+**Types in Spring:**
+1. Constructor Injection ✅ (Recommended)
+2. Setter Injection
+3. Field Injection
+
+**Example – Constructor Injection:**
+```java
+@Component
+public class OrderService {
+    private final PaymentService paymentService;
+
+    @Autowired
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+}
+```
+
+Here, PaymentService is injected by the Spring container.
+💡 In short: DI is how IoC is implemented — the framework supplies dependencies rather than the class creating them.
+
+
+### **3. Dependency Inversion Principle (DIP)**
+
+**Definition (Simple):**
+Part of SOLID principles →  
+>High-level modules should not depend on low-level modules. Both should depend on abstractions.
+
+- Depend on interfaces, not on concrete classes.
+- Makes your code flexible, testable, and easy to maintain.
+
+**Example – Without DIP (Tightly Coupled):**
+```java
+public class OrderService {
+    private final PayPalService paymentService = new PayPalService();
+
+    public void processOrder() {
+        paymentService.pay();
+    }
+}
+```
+Changing the payment provider here means modifying `OrderService`.
+
+**Example – With DIP (Loosely Coupled):**
+```java
+public interface PaymentService {
+    void pay();
+}
+
+@Component
+public class PayPalService implements PaymentService {
+    public void pay() {
+        System.out.println("Paid via PayPal");
+    }
+}
+
+@Component
+public class StripeService implements PaymentService {
+    public void pay() {
+        System.out.println("Paid via Stripe");
+    }
+}
+
+@Component
+public class OrderService {
+    private final PaymentService paymentService;
+
+    @Autowired
+    public OrderService(PaymentService paymentService) {
+        this.paymentService = paymentService;
+    }
+
+    public void processOrder() {
+        paymentService.pay();
+    }
+}
+```
+The `OrderService` now depends on an interface, and Spring can inject any implementation.
