@@ -12,7 +12,7 @@
 10. [You are tasked with securing certain endpoints in a Spring Boot application so that only users with specific roles can access them. Users authenticate via tokens that include their roles as claims. How would you configure your application to ensure that access to these endpoints is restricted based on user roles, and that the role checks are applied to method-level security in your controllers or services](#-you-are-tasked-with-securing-certain-endpoints-in-a-spring-boot-application-so-that-only-users-with-specific-roles-can-access-them-users-authenticate-via-tokens-that-include-their-roles-as-claims-how-would-you-configure-your-application-to-ensure-that-access-to-these-endpoints-is-restricted-based-on-user-roles-and-that-the-role-checks-are-applied-to-method-level-security-in-your-controllers-or-services)
 11. [How can you handle exceptions globally in a Spring Boot application?](#-how-can-you-handle-exceptions-globally-in-a-spring-boot-application)
 12. [IoC vs Dependency Injection vs Dependency Inversion](#-ioc-vs-dependency-injection-vs-dependency-inversion)
-
+13. [How does SpringBootApplication runs](#-how-does-springapplication-works-functionality-of-springbootapplication)
 
 
 ---
@@ -1181,3 +1181,175 @@ public class OrderService {
 }
 ```
 The `OrderService` now depends on an interface, and Spring can inject any implementation.
+
+
+## 🔹 How does SpringApplication works? (Functionality of @SpringBootApplication)
+
+@SpringBootApplication is a meta-annotation combining:
+- @SpringBootConfiguration → special @Configuration for Spring Boot apps.
+- @EnableAutoConfiguration → auto-loads config based on the classpath.
+- @ComponentScan → scans packages for beans.
+
+## **Startup Flow Steps**
+
+```text
+[ JVM Starts ]
+     |
+     v
+[ main() method -> SpringApplication.run() ]
+     |
+     v
+[ Create SpringApplication ] -- sets env, profiles, logging
+     |
+     v
+[ Initialize Environment ] -- loads props/yml, system vars, profiles
+     |
+     v
+[ Create ApplicationContext ] -- BeanFactory ready
+     |
+     v
+[ @ComponentScan ] -- scans 'com.dsa' & subpackages
+     |
+     v
+[ @EnableAutoConfiguration ] -- load relevant configs via spring.factories
+     |
+     v
+[ Instantiate & Inject Beans ]
+     |
+     v
+[ Start Embedded Server ] -- Tomcat by default
+     |
+     v
+[ Run CommandLineRunner/ApplicationRunner Beans ]
+     |
+     v
+[ Application Ready ] -- APIs & scheduled tasks active
+```
+
+
+## 🔹 Spring Scheduler – Explanation & Interview Q&A
+
+Spring Boot provides a **built-in task scheduling support** that allows us to run methods periodically or at scheduled times without manually handling threads or timers.
+
+## **1️⃣ What is Spring Scheduler?**
+
+**Spring Scheduler** is a feature that enables running tasks at **fixed intervals**, **delays**, or **cron expressions** using annotations, without manually implementing a `Timer` or `Quartz` scheduler.
+
+It’s powered by:
+- `@EnableScheduling` → Turns on scheduling capability in Spring.
+- `@Scheduled` → Marks a method to run on a particular schedule.
+
+## **2️⃣ How to Enable Scheduling in Spring Boot**
+
+First, enable scheduling by placing `@EnableScheduling` in a configuration or main application class:
+
+```java
+import org.springframework.boot.SpringApplication;
+import org.springframework.boot.autoconfigure.SpringBootApplication;
+import org.springframework.scheduling.annotation.EnableScheduling;
+
+@SpringBootApplication
+@EnableScheduling
+public class SchedulerApplication {
+    public static void main(String[] args) {
+        SpringApplication.run(SchedulerApplication.class, args);
+    }
+}
+```
+
+## **3️⃣ Using `@Scheduled` Annotation**
+
+```java
+import org.springframework.scheduling.annotation.Scheduled;
+import org.springframework.stereotype.Component;
+
+@Component
+public class ScheduledTasks {
+
+    // Runs every 5 seconds
+    @Scheduled(fixedRate = 5000)
+    public void runAtFixedRate() {
+        System.out.println("Fixed Rate Task executed at " + System.currentTimeMillis());
+    }
+
+    // Runs 5 seconds after the previous execution is complete
+    @Scheduled(fixedDelay = 5000)
+    public void runWithFixedDelay() {
+        System.out.println("Fixed Delay Task executed at " + System.currentTimeMillis());
+    }
+
+    // Runs every day at 10:30 AM using Cron expression
+    @Scheduled(cron = "0 30 10 * * ?")
+    public void runDailyAt1030AM() {
+        System.out.println("Cron Task executed at 10:30 AM");
+    }
+}
+```
+
+## **4️⃣ Common Interview Questions & Answers**
+
+> How do you enable scheduling in Spring Boot?
+
+- Add @EnableScheduling to your main class or a configuration class.
+- Use @Scheduled on methods to schedule tasks.
+
+> Difference between `fixedRate` and `fixedDelay`?
+
+- fixedRate → Starts a new execution after a fixed period from the start of last execution.
+- fixedDelay → Starts a new execution after a fixed period from the end of last execution.
+
+💡 Example:  
+If a task takes 2 seconds and 
+- fixedRate = 5s → runs at t=0s, t=5s, t=10s (ignores task completion time).
+- fixedDelay = 5s → runs at t=0s, t=7s, t=14s (waits for completion + 5s).
+
+> What is the cron expression format in Spring?
+
+```text
+second minute hour day-of-month month day-of-week
+```
+Example:
+- 0 0 * * * ? → Every hour, at minute 0.
+- 0 0/5 14,18 * * ? → Every 5 minutes during 2 PM & 6 PM.
+The ? in the expression is used for fields when the value is "not specified".
+
+> How to run multiple scheduled tasks in parallel?
+
+By default, Spring runs scheduled tasks sequentially in a **single-threaded scheduler**.  
+To run them in parallel, we need a **thread pool scheduler**
+```java
+import org.springframework.context.annotation.Bean;
+import org.springframework.context.annotation.Configuration;
+import org.springframework.scheduling.concurrent.ThreadPoolTaskScheduler;
+
+@Configuration
+public class SchedulerConfig {
+
+    @Bean
+    public ThreadPoolTaskScheduler taskScheduler() {
+        ThreadPoolTaskScheduler scheduler = new ThreadPoolTaskScheduler();
+        scheduler.setPoolSize(5);
+        scheduler.setThreadNamePrefix("scheduled-task-");
+        return scheduler;
+    }
+}
+```
+
+> How to disable scheduling in some environments?
+
+- Using Spring profiles
+
+```java
+@EnableScheduling
+@Configuration
+@Profile("prod") // Runs only in production
+public class ProdSchedulerConfig {
+}
+```
+
+- Or disable globally in `application.properties`
+
+```yaml
+spring.task.scheduling.enabled=false
+```
+
