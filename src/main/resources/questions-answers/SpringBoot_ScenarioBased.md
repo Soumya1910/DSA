@@ -13,6 +13,8 @@
 11. [How can you handle exceptions globally in a Spring Boot application?](#-how-can-you-handle-exceptions-globally-in-a-spring-boot-application)
 12. [IoC vs Dependency Injection vs Dependency Inversion](#-ioc-vs-dependency-injection-vs-dependency-inversion)
 13. [How does SpringBootApplication runs](#-how-does-springapplication-works-functionality-of-springbootapplication)
+14. [Spring Scheduler Explanation and Q&A](#-spring-scheduler--explanation--interview-qa)
+15. [Resilience4j Patterns – Circuit Breaker, Retry, Rate Limiter, Bulkhead, Time Limiter, Cache](#-resilience4j-patterns--circuit-breaker-retry-rate-limiter-bulkhead-time-limiter-cache)
 
 
 ---
@@ -1353,3 +1355,244 @@ public class ProdSchedulerConfig {
 spring.task.scheduling.enabled=false
 ```
 
+## 🔹 Resilience4j Patterns – Circuit Breaker, Retry, Rate Limiter, Bulkhead, Time Limiter, Cache
+
+Resilience4j is a **lightweight fault tolerance library** which provides patterns to make distributed systems safer and more resilient.
+
+✅ **Supported Patterns:**
+1. Circuit Breaker
+2. Retry
+3. Rate Limiter
+4. Bulkhead
+5. Time Limiter
+6. Cache
+
+
+### **1️⃣ Circuit Breaker**
+
+**Definition:** Prevents repeated requests to a failing service to avoid cascading failures.  
+
+**States:** Closed → Open → Half-Open → Closed.
+
+| Property | Purpose | Example Value | Explanation |
+|----------|---------|---------------|-------------|
+| `slidingWindowSize` | Number of calls recorded for calculating failure rate. | `5` | The breaker examines the **last 5 calls** to compute the error percentage. |
+| `failureRateThreshold` | Threshold of failed calls to open the circuit. | `50` | If **50% or more** calls within the sliding window fail, the breaker opens and prevents further calls until reset. |
+| `waitDurationInOpenState` | Time the breaker stays open before trying again. | `10s` | After 10 seconds, the circuit moves to **Half-Open** state to allow limited test calls for checking recovery. |
+
+**Flow Example:**
+- If 3/5 calls fail → 60% failure rate → exceeds threshold, opens circuit.  
+- For 10s, all calls instantly fail with a fallback.  
+- Then, Half-Open allows limited calls. If success rate improves, closes circuit.
+
+**YAML Config:**
+```yaml
+resilience4j:
+  circuitbreaker:
+    instances:
+      myServiceCB:
+        slidingWindowSize: 5
+        failureRateThreshold: 50
+        waitDurationInOpenState: 10s
+```
+
+```java
+@CircuitBreaker(name = "myServiceCB", fallbackMethod = "fallback")
+public String callApi() {
+    throw new RuntimeException("Failed");
+}
+public String fallback(Throwable ex) { return "Fallback: " + ex.getMessage(); }
+```
+
+### **2️⃣ Retry**
+
+**Definition:** Automatically retries failed calls a specified number of times.
+
+**Flow Example:**
+First call fails → wait 2s → 2nd attempt → wait 2s → 3rd attempt → if still fails → fallback called.
+
+| Property | Purpose | Example Value | Explanation |
+|----------|---------|---------------|-------------|
+| `maxAttempts` | Total retry attempts including the original call. | `3` | The operation is executed up to **3 times** upon failure. First call + 2 retries. |
+| `waitDuration` | Delay between attempts. | `2s` | Waits 2 seconds before each retry attempt to reduce load and allow transient issues to resolve. |
+
+
+```yaml
+resilience4j:
+  retry:
+    instances:
+      myRetry:
+        maxAttempts: 3
+        waitDuration: 2s
+```
+
+```java
+@Retry(name = "myRetry", fallbackMethod = "retryFallback")
+public String fetchData() { 
+	//... 
+    }
+```
+
+### **3️⃣ Rate Limiter**
+
+**Definition:** Restricts the number of allowed calls in a time period.
+
+**Flow Example:**
+- If 6th call is made within 10 seconds → blocked/fallback triggered.  
+- After 10s → 5 new calls allowed.
+
+| Property | Purpose | Example Value | Explanation |
+|----------|---------|---------------|-------------|
+| `limitForPeriod` | Maximum allowed calls in a single cycle. | `5` | Only 5 calls are permitted in each refresh period; excess calls trigger a fallback or are denied. |
+| `limitRefreshPeriod` | Duration after which permits reset. | `10s` | Every 10 seconds, a fresh quota of calls becomes available. |
+
+
+```yaml
+resilience4j:
+  ratelimiter:
+    instances:
+      myRateLimiter:
+        limitForPeriod: 5
+        limitRefreshPeriod: 10s
+```
+
+```java
+@RateLimiter(name = "myRateLimiter", fallbackMethod = "rateFallback")
+public String handle() { return "OK"; }
+```
+
+### **4️⃣ Bulkhead**
+
+**Definition:** Limits the number of concurrent calls to isolate failures.
+
+**Flow Example:**
+If pool has 5 active calls, 6th waits ≤ 2s for free slot → if none frees, triggers fallback.
+
+| Property | Purpose | Example Value | Explanation |
+|----------|---------|---------------|-------------|
+| `maxConcurrentCalls` | Maximum parallel calls allowed. | `5` | Limits simultaneous method executions to 5 threads, isolating failures and preventing resource exhaustion. |
+| `maxWaitDuration` | Time to wait for a free slot if all are full. | `2s` | If no slot frees within 2 seconds, the call fails immediately with a fallback. |
+
+
+```yaml
+resilience4j:
+  bulkhead:
+    instances:
+      myBulkhead:
+        maxConcurrentCalls: 5
+        maxWaitDuration: 2s
+```
+
+```java
+@Bulkhead(name = "myBulkhead", fallbackMethod = "bulkheadFallback")
+public String process() { return "Work"; }
+```
+
+### **5️⃣ Time Limiter**
+
+**Definition:** Sets a timeout for calls.
+
+**Flow Example:**
+If remote API call takes > 2s → fallback method invoked and task cancelled (thread freed).
+
+| Property | Purpose | Example Value | Explanation |
+|----------|---------|---------------|-------------|
+| `timeoutDuration` | Maximum execution time allowed. | `2s` | If method execution exceeds 2 seconds, it times out and fallback logic is triggered. |
+| `cancelRunningFuture` | Cancel execution after timeout. | `true` | Stops the ongoing background task after exceeding `timeoutDuration` to free resources. |
+
+
+```yaml
+resilience4j:
+  timelimiter:
+    instances:
+      myTimeLimiter:
+        timeoutDuration: 2s
+        cancelRunningFuture: true
+```
+
+```java
+@TimeLimiter(name = "myTimeLimiter", fallbackMethod = "timeoutFallback")
+public CompletableFuture<String> slowCall() { //... 
+	// 
+    }
+```
+
+### **6️⃣ Cache**
+**Definition:** Caches results to avoid repetitive expensive calls.
+
+```java
+@CacheResult(cacheName = "myCache")
+public String getData(String id) { //... 
+	}
+```
+
+### **Resilience4j Pattern Chaining Diagram**
+
+```text
+[ Client Request ]
+      |
+      v
++----------------+       +----------------+        +----------------+       +----------------+      +----------------+
+| Rate Limiter   | --->  | Circuit Breaker|  --->  | Retry          | --->  | Bulkhead       | ---> | Time Limiter   |
++----------------+       +----------------+        +----------------+       +----------------+      +----------------+
+      |                         |                          |                       |                      |
+      v                         v                          v                       v                      v
+  Check quota             Check failure rate          Retry on failure       Limit concurrent       Timeout & cancel
+  allow/deny              open/close circuit          up to maxAttempts      threads, wait ≤ t     long-running calls
+
+      |
+      v
+[ Remote API Call ]
+      |
+      v
+[ Success Response / Fallback if any step fails ]
+```
+
+### **Unified Example – All Patterns Chained in One Service Method**
+
+```java
+package com.example.demo.service;
+
+import io.github.resilience4j.bulkhead.annotation.Bulkhead;
+import io.github.resilience4j.circuitbreaker.annotation.CircuitBreaker;
+import io.github.resilience4j.ratelimiter.annotation.RateLimiter;
+import io.github.resilience4j.retry.annotation.Retry;
+import io.github.resilience4j.timelimiter.annotation.TimeLimiter;
+import org.springframework.stereotype.Service;
+
+import java.util.concurrent.CompletableFuture;
+
+@Service
+public class ResilientApiService {
+
+    @RateLimiter(name = "myRateLimiter", fallbackMethod = "fallback")
+    @CircuitBreaker(name = "myServiceCB", fallbackMethod = "fallback")
+    @Retry(name = "myRetry", fallbackMethod = "fallback")
+    @Bulkhead(name = "myBulkhead", type = Bulkhead.Type.THREADPOOL, fallbackMethod = "fallback")
+    @TimeLimiter(name = "myTimeLimiter", fallbackMethod = "fallback")
+    public CompletableFuture<String> callRemoteApi() {
+        return CompletableFuture.supplyAsync(() -> {
+            // Simulate remote API delay/failure
+            try {
+                Thread.sleep(3000); // 3s delay
+            } catch (InterruptedException e) {
+                Thread.currentThread().interrupt();
+            }
+            if (Math.random() > 0.5) {
+                throw new RuntimeException("Simulated failure");
+            }
+            return "Remote API success";
+        });
+    }
+
+    public CompletableFuture<String> fallback(Throwable t) {
+        return CompletableFuture.completedFuture("Fallback response: " + t.getMessage());
+    }
+}
+```
+
+
+💡 **Best Practice Combinations**
+- Retry + Circuit Breaker → Recover from transient errors but stop hammering a dead system.
+- Rate Limiter + Time Limiter → Prevent overload and cut off slow calls.
+- Bulkhead + Retry → Isolate resources and retry allowed calls safely.
