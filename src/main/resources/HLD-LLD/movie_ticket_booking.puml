@@ -1,0 +1,37 @@
+@startuml
+title Seat Booking Sequence - Movie Ticket Booking System
+
+actor User
+User -> API_Gateway: GET /shows/{id}/seats
+API_Gateway -> Show_Service: Fetch show details
+Show_Service -> Seat_Service: Get seats & status
+Seat_Service --> Show_Service: Seat List
+Show_Service --> API_Gateway: Show w/ Seat Availability
+API_Gateway --> User: Show Seat Map
+
+== Booking Initiation ==
+User -> API_Gateway: POST /book {show_id, seat_ids}
+API_Gateway -> Booking_Service: Initiate booking
+
+alt Concurrency Control
+    Booking_Service -> Seat_Service: Lock seats (Optimistic/Pessimistic/Temp hold)
+    Seat_Service --> Booking_Service: Lock confirmation
+else Seats already booked
+    Booking_Service --> API_Gateway: Return failure
+    API_Gateway --> User: Booking failed - seats unavailable
+end
+
+== Payment ==
+Booking_Service -> Payment_Service: Payment request
+Payment_Service --> Payment_Gateway: Authorize payment
+Payment_Gateway --> Payment_Service: Approval
+Payment_Service --> Booking_Service: Payment success
+
+== Confirmation ==
+Booking_Service -> Seat_Service: Update seat status to BOOKED
+Booking_Service -> Notification_Service: Send booking confirmation
+Notification_Service --> User: Email/SMS/Push notification
+
+API_Gateway --> User: Booking success response
+
+@enduml
