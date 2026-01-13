@@ -2,19 +2,25 @@
 
 1. [How can you validate two specific conditions in a YAML property file while creating a bean in a SpringBoot Application?](#-how-can-you-validate-two-specific-conditions-in-a-yaml-property-file-while-creating-a-bean-in-a-springboot-application)
 2. [Your SpringBoot application is facing Performance issue under high load. What steps would you take to diagnose and resolve the problem?](#-your-springboot-application-is-facing-performance-issue-under-high-load-what-steps-would-you-take-to-diagnose-and-resolve-the-problem)
-3. [How would you scale your springboot application to handle increased traffic and what spring boot feature can assist with this?](#-how-would-you-scale-your-springboot-application-to-handle-increased-traffic-and-what-spring-boot-feature-can-assist-with-this)
-4. [How do you manage transactions in a Spring Boot Application? and what code is running internally when using the @Transactional annotation](#-how-do-you-manage-transactions-in-a-spring-boot-application-and-what-code-is-running-internally-when-using-the-transactional-annotation)
-5. [How can you deploy a small Spring Boot application cost-effectively, ensuring that you only pay for server resources when the application is in use?](#-how-can-you-deploy-a-small-spring-boot-application-cost-effectively-ensuring-that-you-only-pay-for-server-resources-when-the-application-is-in-use)
-6. [How would you handle multiple beans of the same type in Spring Boot?](#-how-would-you-handle-multiple-beans-of-the-same-type-in-spring-boot)
-7. [We do not want a dependency to be auto-configured by AutoConfiguration in a Spring Boot Application, what steps do we need to take to achieve this requirement?](#-we-do-not-want-a-dependency-to-be-auto-configured-by-autoconfiguration-in-a-spring-boot-application-what-steps-do-we-need-to-take-to-achieve-this-requirement)
-8. [Implementing logging of incoming requests before controller processing in Spring Boot](#-you-are-developing-a-spring-boot-application-that-handles-user-requests-to-access-a-set-of-apis-you-need-to-implement-a-logging-mechanism-that-captures-the-details-of-incoming-requests-like-url-http-method-and-request-body-before-the-controller-processes-them-how-to-achieve-that-in-spring-boot)
-9. [In a Spring Boot application, you need to ensure that all service methods annotated with `@Transactional` are logged with the execution time taken by each method. How would you implement this in Spring Boot?](#-in-a-spring-boot-application-you-need-to-ensure-that-all-service-methods-annotated-with-transactional-are-logged-with-the-execution-time-taken-by-each-method-how-would-you-implement-this-in-spring-boot)
-10. [You are tasked with securing certain endpoints in a Spring Boot application so that only users with specific roles can access them. Users authenticate via tokens that include their roles as claims. How would you configure your application to ensure that access to these endpoints is restricted based on user roles, and that the role checks are applied to method-level security in your controllers or services](#-you-are-tasked-with-securing-certain-endpoints-in-a-spring-boot-application-so-that-only-users-with-specific-roles-can-access-them-users-authenticate-via-tokens-that-include-their-roles-as-claims-how-would-you-configure-your-application-to-ensure-that-access-to-these-endpoints-is-restricted-based-on-user-roles-and-that-the-role-checks-are-applied-to-method-level-security-in-your-controllers-or-services)
-11. [How can you handle exceptions globally in a Spring Boot application?](#-how-can-you-handle-exceptions-globally-in-a-spring-boot-application)
-12. [IoC vs Dependency Injection vs Dependency Inversion](#-ioc-vs-dependency-injection-vs-dependency-inversion)
-13. [How does SpringBootApplication runs](#-how-does-springapplication-works-functionality-of-springbootapplication)
-14. [Spring Scheduler Explanation and Q&A](#-spring-scheduler--explanation--interview-qa)
-15. [Resilience4j Patterns – Circuit Breaker, Retry, Rate Limiter, Bulkhead, Time Limiter, Cache](#-resilience4j-patterns--circuit-breaker-retry-rate-limiter-bulkhead-time-limiter-cache)
+3. [How do you improve your API performance by X%?](#how-do-you-improve-your-api-performance-by-x)
+4. [How would you scale your springboot application to handle increased traffic and what spring boot feature can assist with this?](#-how-would-you-scale-your-springboot-application-to-handle-increased-traffic-and-what-spring-boot-feature-can-assist-with-this)
+5. [How do you manage transactions in a Spring Boot Application? and what code is running internally when using the 
+   @Transactional annotation](#-how-do-you-manage-transactions-in-a-spring-boot-application-and-what-code-is-running-internally-when-using-the-transactional-annotation)
+6. [How can you deploy a small Spring Boot application cost-effectively, ensuring that you only pay for server 
+   resources when the application is in use?](#-how-can-you-deploy-a-small-spring-boot-application-cost-effectively-ensuring-that-you-only-pay-for-server-resources-when-the-application-is-in-use)
+7. [How would you handle multiple beans of the same type in Spring Boot?](#-how-would-you-handle-multiple-beans-of-the-same-type-in-spring-boot)
+8. [We do not want a dependency to be auto-configured by AutoConfiguration in a Spring Boot Application, what steps do 
+   we need to take to achieve this requirement?](#-we-do-not-want-a-dependency-to-be-auto-configured-by-autoconfiguration-in-a-spring-boot-application-what-steps-do-we-need-to-take-to-achieve-this-requirement)
+9. [Implementing logging of incoming requests before controller processing in Spring Boot](#-you-are-developing-a-spring-boot-application-that-handles-user-requests-to-access-a-set-of-apis-you-need-to-implement-a-logging-mechanism-that-captures-the-details-of-incoming-requests-like-url-http-method-and-request-body-before-the-controller-processes-them-how-to-achieve-that-in-spring-boot)
+10. [In a Spring Boot application, you need to ensure that all service methods annotated with `@Transactional` are 
+   logged with the execution time taken by each method. How would you implement this in Spring Boot?](#-in-a-spring-boot-application-you-need-to-ensure-that-all-service-methods-annotated-with-transactional-are-logged-with-the-execution-time-taken-by-each-method-how-would-you-implement-this-in-spring-boot)
+11. [You are tasked with securing certain endpoints in a Spring Boot application so that only users with specific roles 
+    can access them. Users authenticate via tokens that include their roles as claims. How would you configure your application to ensure that access to these endpoints is restricted based on user roles, and that the role checks are applied to method-level security in your controllers or services](#-you-are-tasked-with-securing-certain-endpoints-in-a-spring-boot-application-so-that-only-users-with-specific-roles-can-access-them-users-authenticate-via-tokens-that-include-their-roles-as-claims-how-would-you-configure-your-application-to-ensure-that-access-to-these-endpoints-is-restricted-based-on-user-roles-and-that-the-role-checks-are-applied-to-method-level-security-in-your-controllers-or-services)
+12. [How can you handle exceptions globally in a Spring Boot application?](#-how-can-you-handle-exceptions-globally-in-a-spring-boot-application)
+13. [IoC vs Dependency Injection vs Dependency Inversion](#-ioc-vs-dependency-injection-vs-dependency-inversion)
+14. [How does SpringBootApplication runs](#-how-does-springapplication-works-functionality-of-springbootapplication)
+15. [Spring Scheduler Explanation and Q&A](#-spring-scheduler--explanation--interview-qa)
+16. [Resilience4j Patterns – Circuit Breaker, Retry, Rate Limiter, Bulkhead, Time Limiter, Cache](#-resilience4j-patterns--circuit-breaker-retry-rate-limiter-bulkhead-time-limiter-cache)
 
 
 ---
@@ -98,6 +104,57 @@
     - Enable HTTP connection pooling and proper timeouts.
 
 💡 **Tip:** Always reproduce the issue in a staging environment before applying fixes in production!
+
+## 🔹How do you improve your API performance by X%?
+
+My application is heavily dependent on **database** and **event-driven architecture (Kafka)**.  
+To improve API performance significantly, we focused on end-to-end optimization across four major layers — **Database**, **Application**, **Kafka**, and **Infrastructure**.
+
+---
+
+### **1. Database Optimization**
+- **Query Tuning & Indexing** – Identified and optimized slow-running queries using query analysis tools and introduced appropriate indexes to minimize full table scans.
+- **Query Node vs Data Node Separation** – At the infrastructure level, we isolated query nodes from data nodes, which helped balance load and improve parallel query performance.
+- **Selective Field Fetching (Sub-Doc Implementation)** – Replaced `SELECT *` with selective field retrieval to reduce payload size and processing overhead.
+- **Join Optimization** – Sub-queries were refactored into efficient `JOIN` operations where applicable, significantly reducing computation cost.
+- **Sharding & Partitioning** – Distributed large datasets across multiple nodes to parallelize query execution and reduce latency.
+
+---
+
+### **2. Application-Level Optimization**
+- **Asynchronous Processing** – Decoupled heavy synchronous flows (like logging, notifications) using `CompletableFuture` and asynchronous Kafka consumers to speed up request-response cycles.
+- **Parallel Stream Processing** – Leveraged `ParallelStream` for CPU-bound data transformations and batch processing where order wasn’t critical, improving throughput.
+- **Optimized Object Mutability** – Converted frequently modified immutable objects to mutable ones to reduce unnecessary object creation and garbage collection overhead.
+- **Caching with TTL** – Introduced caching (e.g., Redis, Caffeine) for static and configuration data using appropriate TTLs to reduce repetitive database hits.
+- **Connection Pool Tuning** – Tuned thread pools (`@Async` executors) and HikariCP settings (`maximumPoolSize`, `connectionTimeout`) for optimal resource utilization.
+
+---
+
+### **3. Kafka Optimization**
+- **Partition Key Strategy** – Revisited event key generation to ensure even distribution of messages across Kafka partitions, avoiding hotspot partitions.
+- **Batch & Compression Configurations** – Tuned producer properties like `batch.size`, `linger.ms`, and `compression.type` to optimize message throughput.
+- **Consumer Lag Monitoring** – Enabled continuous monitoring using Kafka Lag Exporter and Prometheus to detect bottlenecks early and scale consumers dynamically.
+
+---
+
+### **4. Infrastructure-Level Optimization**
+- **Profiling & Monitoring** – Performed CPU and memory profiling to identify bottlenecks. Based on analysis:
+    - For **I/O-bound** workloads → implemented **horizontal scaling** (more instances)
+    - For **Memory/CPU-intensive** workloads → improved **vertical scaling** (increased instance specs)
+- **JVM Optimization** – Analyzed heap and non-heap usage using tools like VisualVM and JConsole to right-size JVM parameters (`-Xms`, `-Xmx`, GC tuning).
+- **Thread Management** – Monitored thread utilization to fine-tune concurrency levels and prevent thread starvation.
+- **Load Testing** – Re-ran benchmark tests (JMeter, Gatling) post-optimization to validate measurable performance gains.
+
+---
+
+### **📈 Outcome**
+After applying the above optimizations:
+- Reduced average API latency by over **40%**
+- Improved throughput (TPS) by **~50%**
+- Ensured consistent performance under high-load scenarios through better concurrency, caching, and resource scaling
+
+💡 **Takeaway:**  
+End-to-end performance optimization is about **measuring, identifying key bottlenecks, applying targeted fixes**, and **revalidating through benchmarking** across code, infra, and data layers.
 
 ## 🔹 How would you scale your springboot application to handle increased traffic and what spring boot feature can assist with this?
 
