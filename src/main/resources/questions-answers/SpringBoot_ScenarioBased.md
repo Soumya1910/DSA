@@ -21,6 +21,9 @@
 14. [How does SpringBootApplication runs](#-how-does-springapplication-works-functionality-of-springbootapplication)
 15. [Spring Scheduler Explanation and Q&A](#-spring-scheduler--explanation--interview-qa)
 16. [Resilience4j Patterns – Circuit Breaker, Retry, Rate Limiter, Bulkhead, Time Limiter, Cache](#-resilience4j-patterns--circuit-breaker-retry-rate-limiter-bulkhead-time-limiter-cache)
+17. [Component vs Bean - when to use what](#-component-vs-bean--when-to-use-what)
+18. [What happens if a Spring Bean has a private constructor](#-what-happens-if-a-spring-bean-has-a-private-constructor)
+
 
 
 ---
@@ -1653,3 +1656,202 @@ public class ResilientApiService {
 - Retry + Circuit Breaker → Recover from transient errors but stop hammering a dead system.
 - Rate Limiter + Time Limiter → Prevent overload and cut off slow calls.
 - Bulkhead + Retry → Isolate resources and retry allowed calls safely.
+
+
+
+## 🔹 @Component vs @Bean – When to Use What?
+
+These two annotations both tell **Spring’s IoC container** to create and manage objects (beans), but they differ in **where** and **how** the beans are defined.
+
+---
+
+### **1️⃣ @Component – Automatically discovered during component scanning**
+
+**Definition:**  
+Marks a **class** as a Spring-managed bean that will be **auto-detected** when component scanning occurs.
+
+**Typical Usage:**
+Used when you have **your own custom classes or service implementations**.
+
+**Example:**
+```java
+import org.springframework.stereotype.Component;
+
+@Component
+public class PaymentService {
+    public void pay() {
+        System.out.println("Processing payment...");
+    }
+}
+```
+
+### **2️⃣ @Bean – Explicitly declared inside a @Configuration class**
+
+**Definition:**  
+Marks a **method** that returns a bean instance that should be managed by Spring.
+
+**Typical Usage:**
+Used when you need to **manually create and configure third-party objects** or have more control over bean creation.
+
+```java
+@Configuration
+public class AppConfig {
+
+    @Bean
+    public ObjectMapper objectMapper() {
+        ObjectMapper mapper = new ObjectMapper();
+        mapper.findAndRegisterModules();
+        return mapper;
+    }
+}
+```
+
+## ⚖️ **Key Differences**
+
+| Aspect | `@Component` | `@Bean` |
+|--------|---------------|---------|
+| **Applied To** | Class level | Method level |
+| **Declaration Location** | Any class detected via component scanning | Inside a class annotated with `@Configuration` |
+| **Bean Creation Type** | Automatically detected and instantiated by Spring | Explicitly instantiated and returned from a method |
+| **Used For** | Custom application classes (Controllers, Services, etc.) | Third-party classes or objects needing configuration |
+| **Control over Creation Logic** | Limited – Spring uses default constructor | Full control – you decide how to create and configure bean |
+| **Dependency Injection** | Auto-detected via annotations (`@Autowired`, `@ComponentScan`) | Wired manually using configuration method |
+| **Customization** | Less flexible – no parameters | Highly customizable via Java logic inside method |
+| **Scanning Requirement** | Requires `@ComponentScan` or `@SpringBootApplication` | Requires `@Configuration` class |
+| **Example Use Cases** | Service layers, repositories, controllers | ObjectMapper, RestTemplate, DataSource, custom factories |
+
+---
+
+## 🏁 **Conclusion**
+- Use `@Component` (or its variants like `@Service`, `@Repository`, `@Controller`) when you’re defining your own Spring-managed classes.  
+- Use `@Bean` when you want to **manually create, configure, or return third-party objects** within a `@Configuration` 
+  class.
+
+
+# 🔒 What Happens If a Spring Bean Has a Private Constructor?
+
+When you annotate a class with `@Component`, `@Service`, `@Repository`, or declare it with `@Bean`,  
+Spring needs to **instantiate** that class to manage it as a bean within the application context.
+
+However — if that class has a **private constructor**, Spring will generally **fail to create the bean** unless special handling is applied.
+
+---
+
+## ⚙️ **Default Behavior**
+
+### ✅ Case 1: Public / Protected Constructor
+Spring can use the **public** or **protected** constructor to instantiate the bean normally.
+
+Example:
+```java
+@Component
+public class PaymentService {
+    public PaymentService() {
+        System.out.println("PaymentService bean created!");
+    }
+}
+```
+### ✅ Case 2: Private Constructor
+If the class only defines a **private constructor** and no static factory or configuration method, Spring **cannot 
+instantiate** it.
+
+```java
+@Component
+public class PaymentService {
+
+    private PaymentService() {
+        System.out.println("Private constructor called");
+    }
+}
+```
+
+#### 🟥 Result: Application startup fails with a BeanInstantiationException.
+
+```shell
+Caused by: org.springframework.beans.BeanInstantiationException:
+Failed to instantiate [com.example.PaymentService]:
+No default constructor found; nested exception is
+java.lang.IllegalAccessException: class org.springframework.beans.BeanUtils
+cannot access a member of class com.example.PaymentService with modifiers "private"
+```
+
+---
+
+## 💡 **Why It Happens**
+
+- Spring internally uses reflection to create bean instances. 
+- If the constructor is private, reflection-based instantiation fails because the container lacks visibility into private members.  
+- Without a recognized way to construct the object, initialization stops, and the application context fails to start.
+
+---
+
+## ✅ **Ways to Handle It**
+
+1. **Make Constructor Public or Protected**  
+   The simplest and most recommended approach is to expose at least a protected constructor. This keeps your bean accessible to Spring while maintaining encapsulation.
+```java
+@Component
+public class PaymentService {
+	protected PaymentService() { // protected also works
+	}
+} 
+```
+
+2. **Define the Bean Through a Static Factory Method**  
+   If you must restrict constructor visibility, define a public static factory method that returns an instance and register it through a configuration class.  
+   Spring will invoke this method instead of using direct constructor access.
+
+```java
+public class PaymentService {
+    private PaymentService() { }
+
+    public static PaymentService createInstance() {
+        return new PaymentService();
+    }
+}
+```
+Then register through `@Configuration`
+```java
+@Configuration
+public class PaymentConfig {
+
+    @Bean
+    public PaymentService paymentService() {
+        return PaymentService.createInstance();
+    }
+}
+```
+
+3. **Implement Singleton Pattern Outside Spring**  
+   For very specific cases where you control bean lifecycles manually (e.g., static singletons), you can build and inject instances explicitly using `@Bean` configuration methods.
+```java
+public class PaymentService {
+	private static final PaymentService INSTANCE = new PaymentService();
+	private PaymentService() {}
+
+	public static PaymentService getInstance() {
+		return INSTANCE;
+	}
+} 
+```
+Then inject manually
+```java
+@Configuration
+public class PaymentConfig {
+
+    @Bean
+    public PaymentService paymentService() {
+        return PaymentService.getInstance();
+    }
+}
+```
+
+---
+
+## 🚫 **Anti-Pattern Warning**
+
+Relying on private constructors in Spring-managed components is a poor practice.  
+It breaks the Inversion of Control principle and prevents features like AOP proxies, transactions, or autowiring from functioning properly.  
+These beans can’t participate fully in Spring’s dependency injection system.
+
+---
