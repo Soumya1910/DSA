@@ -23,7 +23,7 @@
 16. [Resilience4j Patterns – Circuit Breaker, Retry, Rate Limiter, Bulkhead, Time Limiter, Cache](#-resilience4j-patterns--circuit-breaker-retry-rate-limiter-bulkhead-time-limiter-cache)
 17. [Component vs Bean - when to use what](#-component-vs-bean--when-to-use-what)
 18. [What happens if a Spring Bean has a private constructor](#-what-happens-if-a-spring-bean-has-a-private-constructor)
-
+19. [@Component, @Service, @Repository - Difference](#-difference-between-component-service-and-repository-in-spring)
 
 
 ---
@@ -1855,3 +1855,111 @@ It breaks the Inversion of Control principle and prevents features like AOP prox
 These beans can’t participate fully in Spring’s dependency injection system.
 
 ---
+
+
+# 🧩 Difference Between `@Component`, `@Service`, and `@Repository` in Spring
+
+All three annotations — `@Component`, `@Service`, and `@Repository` — are **stereotype annotations** in Spring Framework.  
+They serve the same fundamental purpose: marking a class as a **Spring-managed bean** so it can be automatically discovered through **component scanning** and registered in the **ApplicationContext**.
+
+However, they differ by **semantic meaning** and **intent of use** in application design layers.
+
+---
+
+## ⚙️ **1️⃣ @Component – Generic Spring Bean**
+
+- **Purpose:**  
+  The most general stereotype annotation. It indicates that the class is a Spring-managed component but doesn’t specify any particular role.
+
+- **Usage:**  
+  Used for classes that don’t fit into traditional service, repository, or controller layers — utility classes, helpers, converters, or custom components.
+
+- **Layer:**  
+  Generic (can appear in any layer).
+
+**Use When:**  
+You want to register a simple component class in the Spring container, such as a helper or configuration-based processor.
+
+---
+
+## ⚙️ **2️⃣ @Service – Business/Service Layer Component**
+
+- **Purpose:**  
+  Specialization of `@Component` used to denote **service-layer classes** that contain **business or application logic**.
+
+- **Usage:**  
+  When defining classes that handle main business operations, orchestrate multiple repositories, or implement use cases.
+
+- **Layer:**  
+  Business / Service Layer
+
+**Why Prefer `@Service`:**
+1. Makes it clear that the class holds business logic.
+2. Helps organization and maintainability — improves readability and separation of concerns.
+3. Supports **AOP (Aspect-Oriented Programming)** targeting business services (e.g., transactions, performance metrics).
+
+**Use When:**  
+You need to encapsulate reusable business operations or coordinate multiple DAO calls within one workflow.
+
+---
+
+## ⚙️ **3️⃣ @Repository – Data Access Layer Component**
+
+- **Purpose:**  
+  Another specialization of `@Component`, specifically for **persistence or data access logic**.
+
+- **Usage:**  
+  Used on classes or interfaces that interact with the database (e.g., `JpaRepository`, `JdbcTemplate`, custom DAO implementation).
+
+- **Layer:**  
+  Data Access Layer
+
+**Additional Behavior:**
+- It triggers **exception translation** automatically — Spring converts **JDBC exceptions** or JPA persistence exceptions into **Spring’s `DataAccessException` hierarchy**.
+- This enables consistent exception handling across different persistence technologies.
+
+**Use When:**  
+Creating repositories or data access objects responsible for database interaction.
+
+---
+
+## 🧭 **Key Differences Summary**
+
+| Aspect | `@Component` | `@Service` | `@Repository` |
+|--------|---------------|-------------|---------------|
+| **Base Annotation Type** | Generic stereotype | Specialized @Component | Specialized @Component |
+| **Layer / Purpose** | Generic component (utility, custom logic) | Business logic / service layer | Data access / persistence layer |
+| **Auto-detected by Component Scan** | ✅ Yes | ✅ Yes | ✅ Yes |
+| **AOP / Transactional Target** | ❌ No (general use only) | ✅ Commonly targeted for transaction & performance monitoring | ✅ Enables exception translation |
+| **Exception Translation** | ❌ Not applicable | ❌ Not applicable | ✅ Converts DB exceptions to Spring DataAccessException |
+| **Semantic Intent** | Tells Spring “this is a bean” | Tells developer “this class holds business logic” | Tells developer “this class deals with data access” |
+| **Example Layer** | Utility, custom processors | Payment, Order, User management | DAO, Repository, Entity access |
+
+---
+
+## 💡 **Best Practice Guidelines**
+
+1. Always choose the **most specific stereotype** for clarity:
+    - Data persistence? → `@Repository`
+    - Business logic? → `@Service`
+    - General-purpose utility? → `@Component`
+
+2. This promotes:
+    - Better code readability and team understanding.
+    - Layered architecture discipline.
+    - Easier application of AOP (logging, transactions, metrics) per layer.
+
+3. They are all **functionally equivalent** but differ in **semantic clarity** and **extra processing support** (mainly `@Repository`).
+
+---
+
+## ✅ **Conclusion**
+
+- `@Component` → Generic, common-purpose Spring-managed component.
+- `@Service` → Holds business logic or service orchestration responsibilities.
+- `@Repository` → Handles database operations and provides exception translation.
+
+> 💬 **In short:**
+> - Use `@Component` for general-purpose beans,
+> - `@Service` for business logic, and
+> - `@Repository` for data persistence logic.
