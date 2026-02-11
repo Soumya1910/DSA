@@ -26,7 +26,7 @@
 19. [@Component, @Service, @Repository - Difference](#-difference-between-component-service-and-repository-in-spring)
 20. [SpringBootApplication fails after deployment, what will you look first?](#-your-spring-boot-app-works-locally-but-fails-after-deployment--what-do-you-check-first)
 21. [You updated `application.properties`, but the change doesn't reflect — why?](#-you-updated-applicationproperties-but-the-change-doesnt-reflect--why)
-
+22. [A REST API returns correct data but response time is inconsistent — why?](#-a-rest-api-returns-correct-data-but-response-time-is-inconsistent--why)
 
 ---
 
@@ -2038,3 +2038,83 @@ Creating repositories or data access objects responsible for database interactio
 5. **Config is coming from an external config source**
    - Spring Cloud Config / Vault / Parameter Store may supply properties at runtime.
    - External source can override your packaged `application.properties`.
+
+---
+
+## ✅ Random 401 / 403 without code changes — possible causes
+
+1. **Expired / rotated tokens (JWT/OAuth)**
+    - Access token expired → **401**
+    - Refresh flow failing / refresh token expired → **401**
+    - Identity provider rotated signing keys (JWKs) and your service is using a stale cached key → **401** (signature 
+      validation fails)
+2. **Clock skew / time sync issues**
+    - Server time drift causes JWT `exp`, `nbf`, `iat` validation to fail intermittently.
+    - Common in multi-node deployments when nodes have different time → “random” failures.
+3. **Role/authority claim mismatch (mapping changed outside code)**
+    - Token claim name changed (e.g., `roles` vs `authorities`) in IdP configuration.
+    - Missing `ROLE_` prefix expectation (`hasRole('ADMIN')` expects `ROLE_ADMIN`) → **403**
+    - User role removed/updated in IdP → **403**
+4. **Requests sometimes missing `Authorization` header**
+    - Client intermittently not sending header due to:
+        - CORS/preflight issues (browser drops auth for some calls)
+        - Proxy/gateway stripping headers
+        - Load balancer / ingress config differences per route
+    - Missing/empty header → **401**
+5. **Gateway / WAF / API management intermittently blocking**
+    - Rate limiting, IP restrictions, geo restrictions, bot protection, anomaly detection.
+    - Can produce **403** even though app code didn’t change.
+
+**Quick isolation checks**
+- Confirm if 401/403 comes from **your app** or **gateway** (response headers/body, gateway logs).
+- Compare failing vs successful requests:
+    - same token? same endpoint? same instance/pod?
+- Log security context details on denial (principal, authorities, token `kid`, `exp`) in a safe way (no full token logging).
+
+---
+
+## ✅ A REST API returns correct data but response time is inconsistent — why?
+
+1. **Cold vs warm execution (JIT / caches)**
+    - First few requests are slower due to:
+        - JVM JIT compilation warming up
+        - Classloading
+        - Connection pool warming (DB/HTTP)
+        - Cache miss vs cache hit (Redis/app cache)
+
+2. **Database variability**
+    - Same query, different latency because of:
+        - Missing/inefficient indexes → sometimes full scans
+        - Query plan changes / parameter sniffing
+        - Locking / contention (row/table locks)
+        - DB CPU spikes / IO wait
+        - Connection pool starvation (waiting for a DB connection)
+
+3. **Thread pool saturation**
+    - Under load, requests queue up:
+        - Tomcat/Netty worker threads exhausted
+        - `@Async` executor pool exhausted
+        - Kafka / scheduler / background jobs consuming CPU/threads
+    - Symptoms: high p95/p99 latency but p50 looks fine
+
+4. **Garbage Collection (GC) pauses**
+    - Stop-the-world pauses cause intermittent spikes.
+    - Happens more with:
+        - High object allocation rate
+        - Large responses / serialization overhead
+        - Memory pressure / wrong heap sizing
+
+5. **Rate limiting / gateway policies**
+    - API gateway can add latency:
+        - auth introspection calls
+        - WAF checks
+        - throttling queues
+
+**How to confirm quickly**
+- Add metrics for **p50/p95/p99** (Actuator + Micrometer).
+- Break down latency: **controller time vs DB time vs downstream time**.
+- Check GC logs + thread dumps during spikes.
+- Correlate slow requests with:
+    - DB connection wait time
+    - external call duration
+    - pod/node CPU throttling
