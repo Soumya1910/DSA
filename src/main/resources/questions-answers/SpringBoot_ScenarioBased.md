@@ -24,6 +24,8 @@
 17. [Component vs Bean - when to use what](#-component-vs-bean--when-to-use-what)
 18. [What happens if a Spring Bean has a private constructor](#-what-happens-if-a-spring-bean-has-a-private-constructor)
 19. [@Component, @Service, @Repository - Difference](#-difference-between-component-service-and-repository-in-spring)
+20. [SpringBootApplication fails after deployment, what will you look first?](#-your-spring-boot-app-works-locally-but-fails-after-deployment--what-do-you-check-first)
+21. [You updated `application.properties`, but the change doesn't reflect — why?](#-you-updated-applicationproperties-but-the-change-doesnt-reflect--why)
 
 
 ---
@@ -1963,3 +1965,76 @@ Creating repositories or data access objects responsible for database interactio
 > - Use `@Component` for general-purpose beans,
 > - `@Service` for business logic, and
 > - `@Repository` for data persistence logic.
+
+---
+
+## ✅ Your Spring Boot app works locally but fails after deployment — what do you check first?
+
+1. **Deployment logs (first root-cause exception)**
+    - Check container/platform logs (K8s kubectl logs, ECS/CloudWatch, Heroku logs, etc.) for the *first* failure (not the last “Application failed to start” line).
+    - Look for common root causes:
+      - `Failed to bind properties...`
+      - `BeanCreationException`
+      - `Port already in use`
+      - `Cannot connect to ... (DB/Redis/Kafka)`
+      - `ClassNotFoundException / NoSuchMethodError`
+2. **Active profile + configuration mismatch**
+    - Verify `SPRING_PROFILES_ACTIVE` in the deployed environment.
+    - Ensure the correct config exists: `application-<profile>.yml/properties`.
+    - Confirm all required env vars/secrets are set (missing values often break startup).
+3. **Port / server binding issues**
+    - In containers/platforms, the app must listen on the platform-provided port. Check `server.port`
+4. **External dependencies connectivity**
+    - Validate connectivity from the deployed runtime to:
+        - database
+        - Redis
+        - kafka
+        - external APIs
+    - Confirm timeouts, connection pool sizes, and DNS are correct in that environment.
+5. **Secrets / permissions**
+    - Confirm secrets are mounted/injected correctly (K8s Secrets, AWS Parameter Store, Vault, etc.).
+    - Check IAM role / service account permissions for:
+        - Reading secrets/config
+        - Accessing S3/queues/topics/DB endpoints (if applicable)
+6. **Java version / runtime compatibility**
+    - Ensure deployment runtime matches build requirements (your project uses **Java 21**).
+    - Verify the artifact is correct (fat jar) and entrypoint is correct (`java -jar app.jar`).
+7. **Health checks killing the app**
+    - The app may start but fail readiness/liveness probes and restart continuously.
+    - Check:
+        - Startup time vs probe thresholds
+        - Actuator health endpoints
+        - Dependency health contributing to overall `DOWN`
+8. **Reverse proxy / ingress / gateway config**
+    - If app is “up” but endpoints don’t work:
+      - Ingress path rewriting
+      - `X-Forwarded-*` headers
+      - SSL termination / redirects
+      - Base path / context path mismatch
+
+---
+
+## ✅ You updated `application.properties`, but the change doesn't reflect — why?
+
+1. **Wrong profile is active**
+    - App may be running with another profile, check `spring.profiles.active` or Environment variable 
+      `SPRING_PROFILES_ACTIVE`
+2. **App wasn’t restarted / redeployed**
+    - `application.properties` is read at startup.
+    - In containers: you must rebuild the image + redeploy.
+3. **Config is overridden by environment variables / system properties**
+    - In deployment, properties are generally overridden by:
+        - Env vars
+        - JVM args
+        - Command Line args
+        - Kubernetes ConfigMap / Helm values
+    - Result: Your file change is ignored.
+4. **Editing the wrong file / wrong location**
+    - Spring Boot loads config from specific locations, e.g.:
+      - `classpath:/application.properties`
+      - `file:./config/`
+      - `file:./`
+    - You might have updated the IDE file, but the running artifact uses a different copy.
+5. **Config is coming from an external config source**
+   - Spring Cloud Config / Vault / Parameter Store may supply properties at runtime.
+   - External source can override your packaged `application.properties`.
