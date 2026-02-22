@@ -51,7 +51,8 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
 ### Problem Statements
 1. [Maximum Sum of SubArray With Given size](./src/main/java/com/dsa/slidingWindow/fixedWindow/Maximum_Sum_SubArray_With_Given_Size_K_1.java)
 2. [First Negative Number in Given Window Size](./src/main/java/com/dsa/slidingWindow/fixedWindow/First_Negative_Number_Window_Size_K_2.java)
-
+3. [Count of Occurrences of Anagram](./src/main/java/com/dsa/slidingWindow/fixedWindow/Count_Of_Occurrences_Anagram_3.java)
+4. 
 
 ## Variable Size Window
 
