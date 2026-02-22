@@ -44,6 +44,15 @@ In Brute-force method, if second loop variable(j) is directly dependent on the f
 14. Minimum difference element in a sorted array
 
 
+# Sliding Window
+
+## Fixed Size Window
+
+### Problem Statements
+1. [Maximum Sum of SubArray With Given size](./src/main/java/com/dsa/slidingWindow/fixedWindow/Maximum_Sum_SubArray_With_Given_Size_K_1.java)
+
+## Variable Size Window
+
 # Dynamic Programming
 
 - One recursive call never leads to DP.

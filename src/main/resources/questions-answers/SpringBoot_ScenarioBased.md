@@ -27,6 +27,9 @@
 20. [SpringBootApplication fails after deployment, what will you look first?](#-your-spring-boot-app-works-locally-but-fails-after-deployment--what-do-you-check-first)
 21. [You updated `application.properties`, but the change doesn't reflect — why?](#-you-updated-applicationproperties-but-the-change-doesnt-reflect--why)
 22. [A REST API returns correct data but response time is inconsistent — why?](#-a-rest-api-returns-correct-data-but-response-time-is-inconsistent--why)
+23. [Database connection pool suddenly got exhausted. How will you identify and fix it?](#-database-connection-pool-suddenly-got-exhausted-how-will-you-identify-and-fix-it)
+
+
 
 ---
 
@@ -2118,3 +2121,47 @@ Creating repositories or data access objects responsible for database interactio
     - DB connection wait time
     - external call duration
     - pod/node CPU throttling
+
+
+## ✅ Database connection pool suddenly got exhausted. How will you identify and fix it?
+
+### 1) Identify (what to check first)
+
+1. **Confirm database connection pool metrics (Actuator / Micrometer / APM)**
+    - Look at:
+        - `active` connections (in-use)
+        - `idle` connections
+        - `pending` / threads waiting for a connection
+        - connection acquire time
+
+2. **Check logs for pool starvation signals**
+    - Typical symptoms:
+        - Requests hanging then timing out
+        - Exceptions like “timeout waiting for connection from pool”
+
+3. **Differentiate “real load” vs “leak”**
+    - If traffic spiked → active grows with throughput.
+    - If traffic is normal but active keeps rising and never comes down → likely **connection leak** (connections not returned).
+
+### 2) Common root causes
+
+1. **Connection leak (most common)**
+    - Not closing JDBC resources (Connection/Statement/ResultSet) in non-Spring-managed JDBC code.
+    - Manually opening connections outside transaction boundaries.
+    - Running queries in a `finally` bug path that never closes.
+
+2. **Long-running / stuck queries**
+    - Missing indexes → suddenly slower due to data growth.
+    - Lock contention (transactions waiting on locks).
+    - Batch jobs / heavy reports running concurrently.
+
+3. **Pool too small or DB too slow for current traffic**
+    - Pool size not aligned with:
+        - Tomcat thread pool
+        - query latency (p95/p99)
+        - downstream retries (which multiply DB calls)
+
+4. **Improper transaction boundaries**
+    - `@Transactional` wrapping too much logic, holding connections for long time.
+    - Nested calls with propagation causing longer-held connections than expected.
+
